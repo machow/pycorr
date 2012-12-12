@@ -3,7 +3,6 @@ import scipy.io as sio
 from funcs_correlate import lagcor, shift
 from pietools import loadwith
 import csv
-from os import path
 
 def lagged(Mlist, M_other, lags=None, subsub=False, offset=0):
     """Calculate lagged correlations over an interval"""
@@ -22,17 +21,18 @@ def csvout(fname, rows):
     f1.close()
 
 
+
 func = lambda x: sio.loadmat(x)['subj_roitc'].reshape(300)
 pipe_args = dict(subdir = 'pieNDiv/subjects',
-                 path = 'analysis/preproc/preproc01.feat/audenv_3mm_gdboth_wordscram_mean_thr0.2_trans_filtered_func_data.mat',
+                 path = 'analysis/preproc/preproc02.feat/trans_filtered_func_data_audenv_3mm_gdboth_wordscram_mean_thr0.2.mat',
                  func = func)
 
 olga_args = dict(subdir = 'pieNDiv/subsnotpipe',
-                 path = 'intact1.feat/audenv_3mm_gdboth_wordscram_mean_thr0.2_trans_filtered_func_data.mat',
+                 path = 'scrambled1.feat/trans_filtered_func_data_audenv_3mm_gdboth_wordscram_mean_thr0.2.mat',
                  func = func)
 
-audpath = 'pieNDiv/data/pieman_intact_audenv.mat'
-alignfile = 'pieNDiv/intersubj/align_intact01.tsv'
+audpath = 'pieNDiv/data/pieman_wordscram_audenv.mat'
+alignfile = 'pieNDiv/intersubj/align_scram01.tsv'
 offset=-10
 tc_len=280
 
@@ -55,7 +55,7 @@ print M_meantc.shape
 lagvals = range(-15,15,1)
 results = {}
 hdr = [['lags'] + Mdict.keys()]
-results['Aud_env_cust'] = hdr + zip(lagvals, *lagged(Mlist, M_aud, lagvals, offset))
-results['Mean_tc_cust'] = hdr + zip(lagvals, *lagged(Mlist, M_meantc, lagvals, offset))
+results['Aud_env_cust_scram'] = hdr + zip(lagvals, *lagged(Mlist, M_aud, lagvals, offset = offset))
+results['Mean_tc_cust_scram'] = hdr + zip(lagvals, *lagged(Mlist, M_meantc, lagvals, offset = offset))
 
 map(csvout, *zip(*results.viewitems()))
