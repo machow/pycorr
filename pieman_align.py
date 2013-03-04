@@ -3,10 +3,21 @@ import scipy.io as sio
 from funcs_correlate import lagcor, shift
 from pietools import loadwith
 import csv
+import yaml
 
 def lagged(Mlist, M_other, lags=None, subsub=False, offset=0):
-    """Calculate lagged correlations over an interval"""
-    if not lags: lags = int(1/5 * M_other.shape[-1])
+    """Return list with lagged correlations for each entry in Mlist
+
+    Parameters:
+    Mlist - list of subject time courses
+    M_other - time course to compare all in Mlist to
+    lags - list of lag values to derive xcorrs for
+    subsub - remove subject timecourse from M_other before calculating
+    offset - Mlist is offset number of time points past M_other
+
+    """
+
+    if not lags: lags = int(1/5 * M_other.shape[-1])            #default number of lags
     out = []
     newM = M_other
     for M_sub in Mlist:
@@ -15,47 +26,49 @@ def lagged(Mlist, M_other, lags=None, subsub=False, offset=0):
     return out
 
 def csvout(fname, rows):
-    f1 = open('lag_' + fname + '.csv', 'w')
+    f1 = open(fname + '.csv', 'w')
     writer = csv.writer(f1)
     writer.writerows(rows)
     f1.close()
 
 
+#LOAD CONFIG
+cnfg = yaml.load(open('config.yaml'))
+condname = ['intact01', 'scram01', 'intact02', 'scram02'][0]                   #select condition
+cond = cnfg['cond'][condname]
+
+#INPUTS
+subdir = cond['subdir']
+nii_aud = cond['filedir'] + cond['nii_aud']             #A1 nifti for each sub
+shiftfile = cond['shift_tc'] + condname + '.tsv'        #How much to shift each sub tc
+aud_env = cond['aud_env']                               #Auditory envelope tc
+outbase = cond['align']                                 #base name for outputs
+###
 
 func = lambda x: sio.loadmat(x)['subj_roitc'].reshape(300)
-pipe_args = dict(subdir = 'pieNDiv/subjects',
-                 path = 'analysis/preproc/preproc02.feat/trans_filtered_func_data_audenv_3mm_gdboth_wordscram_mean_thr0.2.mat',
-                 func = func)
+Mdict = loadwith(subdir, nii_aud, func)   #load subject Aud1 timecourses
 
-olga_args = dict(subdir = 'pieNDiv/subsnotpipe',
-                 path = 'scrambled1.feat/trans_filtered_func_data_audenv_3mm_gdboth_wordscram_mean_thr0.2.mat',
-                 func = func)
-
-audpath = 'pieNDiv/data/pieman_wordscram_audenv.mat'
-alignfile = 'pieNDiv/intersubj/align_scram01.tsv'
+#SHIFT WITH ALIGN FILE
 offset=-10
 tc_len=280
-
-Mdict = loadwith(**pipe_args)
-Mdict.update(loadwith(**olga_args))
-
-if alignfile:
-    aligndict = dict([subentry.strip('\n').split('\t') for subentry in open(alignfile).readlines()])
+if shiftfile:
+    aligndict = dict([subentry.strip('\n').split('\t') for subentry in open(shiftfile).readlines()])
     for key in Mdict.keys():
-        h = int(aligndict[key]) if key in aligndict.keys() else 0
+        h = int(aligndict[key]) if key in aligndict.keys() else 0           #don't shift subjects not in file
         Mdict[key] = shift(Mdict[key], h, tc_len, offset=offset)
     offset = 0
 
-Mlist = Mdict.values()
+#LOAD TIME COURSES FOR XCORR
+Mlist = Mdict.values()                                          #subject tc's
+M_aud = sio.loadmat(aud_env)['audenv'].reshape(280)     #audio envelope
+M_meantc = np.vstack(Mlist).sum(axis=0)                         #mean tc
 
-M_aud = sio.loadmat(audpath)['audenv'].reshape(280)
-M_meantc = np.vstack(Mlist).sum(axis=0)
-print M_meantc.shape
-
+#LAGGED CORRELATIONS
 lagvals = range(-15,15,1)
 results = {}
 hdr = [['lags'] + Mdict.keys()]
-results['Aud_env_cust_scram'] = hdr + zip(lagvals, *lagged(Mlist, M_aud, lagvals, offset = offset))
-results['Mean_tc_cust_scram'] = hdr + zip(lagvals, *lagged(Mlist, M_meantc, lagvals, offset = offset))
+
+results[outbase + '_aud_env_' + condname] = hdr + zip(lagvals, *lagged(Mlist, M_aud, lagvals, offset = offset))
+results[outbase + '_mean_tc_' + condname] = hdr + zip(lagvals, *lagged(Mlist, M_meantc, lagvals, offset = offset))
 
 map(csvout, *zip(*results.viewitems()))

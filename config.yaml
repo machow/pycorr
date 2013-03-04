@@ -1,0 +1,52 @@
+defaults: &defaults
+    subdir: subjects
+    shift_tc: data/align_tc/shift_
+    align: data/align_tc/lag_
+    ISC: intersubj/ISC_
+    nii_trans: trans_filtered_func_data.nii
+    nii_synced: trans_filtered_func_data_sync.npy
+    nii_aud: audenv_3mm_gdboth_wordscram_mean_thr0.2_trans_filtered_func_data.mat
+
+intact: &intact
+    aud_env: data/align_tc/pieman_intact_audenv.mat
+
+scram: &scram
+    aud_env: data/align_tc/pieman_wordscram_audenv.mat
+
+
+roi:
+    aud: data/roi/audenv_3mm_gdboth_wordscram_mean_thr0.2.nii
+    mpfc: data/roi/MPFC_150.nii 
+    rsc: data/roi/RSC.nii
+    bhipp: data/roi/BHipp_3mm_thr30.nii
+    precun: data/roi/precun_3mm_thr50.nii
+
+cond:
+    intact01:
+        cond: intact
+        filedir: analysis/preproc/preproc01.feat/
+        exclude:
+        <<: *defaults
+        <<: *intact
+
+    scram01:
+        cond: wordscram
+        filedir: analysis/preproc/preproc02.feat/
+        exclude:
+        <<: *defaults
+        <<: *scram
+
+    intact02:
+        cond: intact
+        filedir: analysis/preproc/preproc03.feat/
+        exclude:
+        <<: *defaults
+        <<: *intact
+
+    scram02:
+        cond: wordscram
+        filedir: analysis/preproc/preproc04.feat/
+        exclude:
+        <<: *defaults
+        <<: *scram
+

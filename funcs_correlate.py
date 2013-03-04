@@ -54,7 +54,7 @@ def intersubcorr(C_all, excludeself = True):
     covcolsums = C_all.sum(axis=-1)
     N = C_all.shape[-1]
     if excludeself:
-        return (covcolsums - 1) / np.sqrt(covttl[...,np.newaxis] - 2*covcolsums)        #TODO replace final +1 with +diagonal of last 2 dims
+        return (covcolsums - 1) / np.sqrt(covttl[...,np.newaxis] - 2*covcolsums + 1)        #TODO replace final +1 with +diagonal of last 2 dims (np.diagonal(C_
     else:
         return covcolsums / np.sqrt(covttl)
 
@@ -116,10 +116,10 @@ def shift(A, h, outlen, offset=0):
     return A[..., h : outlen+h]
 
 
-def load(fname):
+def load_nii_or_npy(fname):
     """convenience function to load nib or np filetypes"""
     if os.path.splitext(fname)[1] == '.npy': return np.load(fname)
-    else: return nib.load(fname)
+    else: return nib.load(fname).get_data()
 
 
 def loadData(subdir, mrpaths = [], behpaths = [], condnames = None, subs = None):

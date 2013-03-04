@@ -7,66 +7,57 @@
 import numpy as np
 from scipy import io as sio
 import nibabel as nib
-from funcs_correlate import loadData, crosscor, intersubcorr
+from funcs_correlate import crosscor, intersubcorr, load_nii_or_npy
+from pietools import loadwith
+import yaml
 
-#load data
-cond = 'intact01'
-fname = 'trans_filtered_func_data_sync.npy'
-pipeargs = dict(subdir = 'pieNDiv/subjects',
-                mrpaths = ['analysis/preproc/preproc01.feat/'+fname],
-                condnames = [cond],
-                behpaths = [])
+#LOAD CONFIG
+condname = ['intact01', 'scram01', 'intact02', 'scram02'][0]
+cnfg = yaml.load(open('config.yaml'))
+cond = cnfg['cond'][condname]
 
-olgaargs = dict(subdir = 'pieNDiv/subsnotpipe',
-                mrpaths = ['intact1.feat/'+fname],
-                condnames = [cond],
-                behpaths = [])
+#INPUTS
+subdir = cond['subdir']
+nii_synced = cond['filedir'] + cond['nii_synced']       #synced nifti for each sub
+roi_files = cnfg['roi']                                 #rois for xcorrs
+#OUTPUTS
+roi_out = 'intersubj/isc_roi_%s.csv'%condname
+ccr_out = 'intersubj/ccr_'+condname
+mean_c_out = 'intersubj/ccr_mean_'+condname+'.nii'
 
-subdata = loadData(**pipeargs) + loadData(**olgaargs)       #list of subject dicts
-
-#Get a dictionary with sub : data dict
-ddict = {sub['Sub'] : sub['Ni'].values()[0] for sub in subdata}
+#LOAD SUB DATA
+ddict = loadwith(subdir, nii_synced, load_nii_or_npy)
 sub_indx = sorted(ddict.keys())
-dlist = [ddict[sub] for sub in sub_indx]
+dlist = [ddict[sub] for sub in sub_indx]            #list ordered by sub name
 
 #ROIs
-base = 'pieNDiv/data/'
-ROI_files = dict(precun = base + 'precun_3mm_thr50.nii',
-                 bhipp = base + 'BHipp_3mm_thr30.nii',
-                 mpfc = base + 'MPFC_150.nii',
-                 rsc = base + 'RSC.nii',
-                 aud = base + 'audenv_3mm_gdboth_wordscram_mean_thr0.2.nii')
-ROI_maps = {roiname : nib.load(fname).get_data() for roiname, fname in ROI_files.items()}
+roi_maps = {roiname : nib.load(fname).get_data() for roiname, fname in roi_files.items()}
 
 ROI_corr = {}
 ROI_corrmat = {}
-for key, roi in ROI_maps.items():
-    roi_indx = np.nonzero(roi)
-    print dlist[0][roi_indx].mean(axis=0).shape
+for key, roi in roi_maps.items():
+    roi_indx = np.nonzero(roi)                                                      #indices where roi is nonzero
+    print 'TC length:', '\t\t', dlist[0][roi_indx].mean(axis=0).shape
     ccr_roi = crosscor([subentry[roi_indx].mean(axis=0) for subentry in dlist])     #crosscors from single ROI timecourse
-    N = ccr_roi.shape[-1]
     ROI_corr[key] = intersubcorr(ccr_roi)
     ROI_corrmat[key] = ccr_roi
 
 
+#SAVE ROIs
 ROI_corr['Folder'] = sub_indx
-#Save ROIs
 keys = sorted(ROI_corr.keys())
-hdr = np.vstack([key +'.'+cond for key in keys]).T
+hdr = np.vstack([key +'.'+condname for key in keys]).T
 body = np.vstack([ROI_corr[key] for key in keys]).T
-with open('pieman_intersubj_%s_out.csv'%cond, 'w') as outfile:
+with open(roi_out, 'w') as outfile:
     np.savetxt(outfile, hdr, delimiter=',', fmt='%s')
     np.savetxt(outfile, body, delimiter=',', fmt='%s')
 
-
-
-#Whole Brain Correlation matrix
-#This will likely run on the cluster without taking up too much memory, but can be segmented spatially if needed
+#WHOLE BRAIN SUBxSUB CORRELATION MATRIX
 C = crosscor(dlist)
 
-#Intersubject Correlations (mean off-diagonal crosscorrelation)
+#Intersubject Correlations
 mean_C = intersubcorr(C).mean(axis=-1)
 mean_C_nii = nib.Nifti1Image(mean_C, affine=None)
 print mean_C.shape
-sio.savemat('pieNDiv/intersubj/ccr_'+cond, dict(CCR = C, sub_indx=sub_indx))
-nib.save(mean_C_nii, 'pieNDiv/intersubj/ccr_mean_'+cond+'.nii')
+sio.savemat(ccr_out, dict(CCR = C, sub_indx=sub_indx))
+nib.save(mean_C_nii, mean_c_out)

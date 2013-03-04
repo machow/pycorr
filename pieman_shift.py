@@ -1,35 +1,35 @@
 import numpy as np
-from funcs_correlate import shift, loadData
+from funcs_correlate import shift, load_nii_or_npy
+from pietools import loadwith
 from os import path
+import yaml
 
+#CONFIG
+condname = ['intact01', 'scram01', 'intact02', 'scram02'][0]
+cnfg = yaml.load(open('config.yaml'))
+cond = cnfg['cond'][condname]
 
-cond = 'scram01'
-alignf = 'pieNDiv/intersubj/align_' + cond + '.tsv'
+#INPUTS
+subdir = cond['subdir']
+alignf = cond['shift_tc'] + condname + '.tsv'
+nii_trans = cond['filedir'] + cond['nii_trans']
+nii_out = '_sync'
+
 offset=-10
 tc_len=280
 
-pipeargs = dict(subdir = 'pieNDiv/subjects',
-                mrpaths = ['analysis/preproc/preproc02.feat/trans_filtered_func_data.nii'],
-                condnames = [cond],
-                behpaths = [])
+#LOAD DATA
+Mdict = loadwith(subdir, nii_trans, load_nii_or_npy)   #load subject data
 
-olgaargs = dict(subdir = 'pieNDiv/subsnotpipe',
-                mrpaths = ['scrambled1.feat/trans_filtered_func_data.nii'],
-                condnames = [cond],
-                behpaths = [])
-
-#load data
-subdata = loadData(**pipeargs) + loadData(**olgaargs)
-
-#Load alignment file
+#LOAD SHIFT FILE
 aligndict = dict([subentry.strip('\n').split('\t') for subentry in open(alignf).readlines()])
 for key in aligndict: aligndict[key] = int(aligndict[key])
 
-#Shift time course and save (appended with _sync)
-for subdict in subdata:
-    data = subdict['Ni'][cond].get_data()
-    h = aligndict[subdict['Sub']] if (subdict['Sub'] in aligndict.keys()) else 0
-    data = shift(data, h, tc_len, offset)
-    f, ext = path.splitext(subdict['mrpaths'][cond])
-    np.save(path.join(subdict['basedir'], f + '_sync'), data)
-
+#SHIFT TIME COURSE AND SAVE (appended with _sync)
+for key in Mdict.keys():
+    h = int(aligndict[key]) if key in aligndict.keys() else 0           #don't shift subjects not in file
+    Mdict[key] = shift(Mdict[key], h, tc_len, offset)
+    f, ext = path.splitext(nii_trans)
+    print 'writing %s to: \t\t %s'%(key, path.join(f + '_sync'))
+    np.save(path.join(subdir, key, f + nii_out), Mdict[key])
+    #print 'writing %s to: \t\t %s'%(key, path.join(f + '_sync'))
