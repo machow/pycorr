@@ -39,19 +39,22 @@ def corsubs(A, B, axis = -1, standardized = False):
         demean = lambda M: M - np.mean(M, axis = axis)[..., np.newaxis]         #TODO here
         return np.sum(demean(A) * demean(B), axis) / ( np.std(A, axis)*np.std(B,axis) * n )
 
+def sub_isc(dlist, dsummed):
+    return np.array([corsubs(entry, dsummed-entry) for entry in dlist])
 
 def intersubcorr(C_all, excludeself = True):
     """
     Returns an array of intersubj correlations.  Last two dims must be the cov matrix.
 
-    This function uses that the var( sum of R.V.'s ) is the sum of their cov matrix.
+    This function uses that the var( sum of R.V.'s ) is the sum of their cov matrix.  If entire row / col
+    is NaN, then returns ISC as if that subject was removed (to allow dropping voxels with mean activity < 6000.
 
     Parameters:
     excludeself -- is diagonal corr(x_i, x_i)?  remove from calculation?
 
     """
-    covttl = np.apply_over_axes(np.sum, C_all, [-1,-2]).reshape(C_all.shape[:-2])
-    covcolsums = C_all.sum(axis=-1)
+    covttl = np.apply_over_axes(np.nansum, C_all, [-1,-2]).reshape(C_all.shape[:-2])
+    covcolsums = np.nansum(C_all, axis=-1)
     N = C_all.shape[-1]
     if excludeself:
         return (covcolsums - 1) / np.sqrt(covttl[...,np.newaxis] - 2*covcolsums + 1)        #TODO replace final +1 with +diagonal of last 2 dims (np.diagonal(C_
@@ -59,14 +62,13 @@ def intersubcorr(C_all, excludeself = True):
         return covcolsums / np.sqrt(covttl)
 
 
-def crosscor(dlist):
+def crosscor(dlist, standardized = True):
     """Takes list of subject data, returns matrix of correlation matrices at each voxel."""
-    map(standardize, dlist)
     N = len(dlist)
     dims = list(dlist[0].shape[:-1]) + [N,N]   #collapsed across time, expanded #subs x #subs
     C_all = np.zeros(dims)
     for ii, jj in combinations(range(N), 2):
-        C_all[..., ii, jj] = corsubs(dlist[ii], dlist[jj], standardized = True)
+        C_all[..., ii, jj] = corsubs(dlist[ii], dlist[jj], standardized = standardized)
 
     C_all += C_all.transpose(range(len(dims)-2) + [-1,-2]) + np.eye(C_all.shape[-1])       #Fill in symmetry
     return C_all
