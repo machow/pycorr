@@ -1,11 +1,11 @@
 import numpy as np
 import scipy.io as sio
-from funcs_correlate import lagcor, shift
+from funcs_correlate import lagcor, shift, standardize
 from pietools import loadwith
 import csv
 import yaml
 
-def lagged(Mlist, M_other, lags=None, subsub=False, offset=0):
+def lagged(Mlist, M_other, lags=None, remsub=True, offset=0):
     """Return list with lagged correlations for each entry in Mlist
 
     Parameters:
@@ -21,7 +21,7 @@ def lagged(Mlist, M_other, lags=None, subsub=False, offset=0):
     out = []
     newM = M_other
     for M_sub in Mlist:
-        if subsub == True: newM = M_other - M_sub
+        if remsub == True: newM = M_other - M_sub
         out.append([float(lagcor(M_sub, newM, h, standardized=False, offset= offset)) for h in lags])
     return out
 
@@ -60,6 +60,7 @@ if shiftfile:
 
 #LOAD TIME COURSES FOR XCORR
 Mlist = Mdict.values()                                          #subject tc's
+for entry in Mlist: standardize(entry)
 M_aud = sio.loadmat(aud_env)['audenv'].reshape(280)     #audio envelope
 M_meantc = np.vstack(Mlist).sum(axis=0)                         #mean tc
 

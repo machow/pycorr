@@ -43,7 +43,7 @@ ROI_corrmat = {}
 for key, roi in roi_maps.items():
     roi_indx = np.nonzero(roi)                                                      #indices where roi is nonzero
     print 'TC length:', '\t\t', dlist[0][roi_indx].mean(axis=0).shape
-    ccr_roi = crosscor([subentry[roi_indx].mean(axis=0) for subentry in dlist], standardized=True)     #crosscors from single ROI timecourse
+    ccr_roi = crosscor([subentry[roi_indx].mean(axis=0) for subentry in dlist], standardized=False)     #crosscors from single ROI timecourse
     ROI_corr[key] = intersubcorr(ccr_roi)
     ROI_corrmat[key] = ccr_roi
 
