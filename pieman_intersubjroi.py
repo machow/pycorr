@@ -2,6 +2,8 @@
 #
 #   M Chow, Nov 2012
 #   machow@princeton.edu
+#
+#NOTE: THIS HAS BEEN PULLED INTO THE pieman_intersubj.py file
 
 import nibabel as nib
 import numpy as np
