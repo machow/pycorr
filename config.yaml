@@ -9,9 +9,11 @@ defaults: &defaults
 
 intact: &intact
     aud_env: data/align_tc/pieman_intact_audenv.mat
+    ind_tc: data/supersubj/pieman_intact_supersubj.nii
 
 scram: &scram
     aud_env: data/align_tc/pieman_wordscram_audenv.mat
+    ind_tc: data/supersubj/pieman_wordscram_supersubj.nii
 
 
 roi:
@@ -25,6 +27,7 @@ cond:
     intact01:
         cond: intact
         filedir: analysis/preproc/preproc01.feat/
+        calc_ind: True
         exclude:
         <<: *defaults
         <<: *intact
@@ -32,6 +35,7 @@ cond:
     scram01:
         cond: wordscram
         filedir: analysis/preproc/preproc02.feat/
+        calc_ind: True
         exclude:
         <<: *defaults
         <<: *scram
