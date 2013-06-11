@@ -1,4 +1,5 @@
 import numpy as np
+import nibabel as nib
 from funcs_correlate import shift, load_nii_or_npy
 from pietools import loadwith
 from os import path
@@ -31,5 +32,5 @@ for key in Mdict.keys():
     Mdict[key] = shift(Mdict[key], h, tc_len, offset)
     f, ext = path.splitext(nii_trans)
     print 'writing %s to: \t\t %s'%(key, path.join(f + '_sync'))
-    np.save(path.join(subdir, key, f + nii_out), Mdict[key])
+    nib.save(nib.Nifti1Image(Mdict[key], affine=None), path.join(subdir, key, f + nii_out))
     #print 'writing %s to: \t\t %s'%(key, path.join(f + '_sync'))
