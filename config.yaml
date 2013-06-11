@@ -4,8 +4,9 @@ defaults: &defaults
     align: data/align_tc/lag_
     ISC: intersubj/ISC_
     nii_trans: trans_filtered_func_data.nii
-    nii_synced: trans_filtered_func_data_sync.npy
+    nii_synced: trans_filtered_func_data_sync.nii
     nii_aud: audenv_3mm_gdboth_wordscram_mean_thr0.2_trans_filtered_func_data.mat
+    cspan_split: subjects_split/cspan_medsplit.csv
 
 intact: &intact
     aud_env: data/align_tc/pieman_intact_audenv.mat
@@ -22,12 +23,16 @@ roi:
     rsc: data/roi/RSC.nii
     bhipp: data/roi/BHipp_3mm_thr30.nii
     precun: data/roi/precun_3mm_thr50.nii
+    trw_0: data/roi/pieTRWdiff_gdboth_30ss_relmask0.15_roi1_-Inf-0.025.nii.gz
+    trw_1: data/roi/pieTRWdiff_gdboth_30ss_relmask0.15_roi2_0.025-0.125.nii.gz
+    trw_2: data/roi/pieTRWdiff_gdboth_30ss_relmask0.15_roi3_0.125-0.225.nii.gz
+    trw_3: data/roi/pieTRWdiff_gdboth_30ss_relmask0.15_roi4_0.225-Inf.nii.gz
 
 cond:
     intact01:
         cond: intact
         filedir: analysis/preproc/preproc01.feat/
-        calc_ind: True
+        calc_ind: False
         exclude:
         <<: *defaults
         <<: *intact
@@ -35,7 +40,7 @@ cond:
     scram01:
         cond: wordscram
         filedir: analysis/preproc/preproc02.feat/
-        calc_ind: True
+        calc_ind: False
         exclude:
         <<: *defaults
         <<: *scram

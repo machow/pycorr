@@ -42,10 +42,13 @@ def corsubs(A, B, axis = -1, standardized = False):
 def sub_isc(dlist, dsummed):
     return np.array([corsubs(entry, dsummed-entry) for entry in dlist])
 
-def sum_tc(dlist):
+def sum_tc(dlist, nans = True):
     """Returns new timecourse from sum of all timecourses"""
     newA = np.zeros(dlist[0].shape)
-    for entry in dlist: newA += entry
+    if nans:
+        newA = np.nansum(dlist, axis=0)
+    else:
+        for entry in dlist: newA += entry
     return newA
 
 def intersubcorr(C_all, excludeself = True):
