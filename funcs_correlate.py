@@ -8,6 +8,7 @@ import numpy as np
 import nibabel as nib
 import os
 from itertools import combinations
+from scipy.stats.stats import nanmean
 
 def standardize(A, axis = -1, demean = True, devar = True):
     """Subtract mean, divide standard deviation (z-scoring).  Operate in-place.
@@ -42,13 +43,15 @@ def corsubs(A, B, axis = -1, standardized = False):
 def sub_isc(dlist, dsummed):
     return np.array([corsubs(entry, dsummed-entry) for entry in dlist])
 
-def sum_tc(dlist, nans = True):
-    """Returns new timecourse from sum of all timecourses"""
+def sum_tc(dlist, nans = True, standardize_subs=True, standardize_out=True):
+    """Returns new timecourse from sum of all timecourses. Standardizes timecourses in place by default"""
+    if standardize_subs: standardize(dlist)         #operates in place, use with caution!
     newA = np.zeros(dlist[0].shape)
     if nans:
         newA = np.nansum(dlist, axis=0)
     else:
         for entry in dlist: newA += entry
+    if standardize_out: standardize(newA)
     return newA
 
 def intersubcorr(C_all, excludeself = True):
@@ -133,32 +136,19 @@ def load_nii_or_npy(fname):
     else: return nib.load(fname).get_data()
 
 
-def loadData(subdir, mrpaths = [], behpaths = [], condnames = None, subs = None):
-    """Returns list with dictionary entry for each subject in subdir
+def roimask(data, roi, filter_func = None, proc_func = None, mean_ts = False):
+    """Mask data using values in roi > 0
 
     Parameters:
-    subdir -- directory containing subject folders
-    mrpaths -- list with paths to fmri nifti files.  Subs in subdir load each path.
-    behpath -- list with paths to behavioral data.  Subs in subdir load each path.
-    condnames -- (optional) list of names, corresponding to mrpath conditions.
-    subs -- (optional) list which subfolders to use instead of taking all in subdir (default)
-
-    Doesn't get data from nifti files initially, in case many subjects are collected (FACTCHECK?)
+    data -- numpy array to be masked
+    roi -- array to be checked for nonzero values
+    filter_func -- function to further subset roi (e.g. remove time courses with mean < 6000)
+    proc_func -- TODO
 
     """
-    if subs is None: subs = os.listdir(subdir)
-    if not condnames: condnames = mrpaths
-    mrdict = dict(zip(condnames, mrpaths))
-    dlist = [dict(Ni = {cond : load(os.path.join(subdir, sub, mrdict[cond])) for cond in mrdict},
-                  Sub = sub,
-                  Dir = os.path.join(subdir, sub),
-                  beh = {behfile : open(os.path.join(subdir, sub, behpaths), 'r').readlines() for behfile in behpaths},
-                  mri = None,
-                  mrpaths = mrdict,
-                  behpaths = behpaths,
-                  basedir = os.path.join(subdir, sub))
-                for sub in subs]
-    return dlist
 
-def loadROI(roifile, binary=True):
-    pass
+    roi_indx = np.nonzero(roi)
+    roi = data[roi_indx]
+    if filter_func: roi = roi[filter_func(roi)]
+    if mean_ts: nanmean(roi, axis=0)
+    return roi

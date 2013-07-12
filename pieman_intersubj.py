@@ -8,11 +8,11 @@ import numpy as np
 from scipy import io as sio
 from scipy.stats.stats import nanmean
 import nibabel as nib
-from funcs_correlate import crosscor, intersubcorr, load_nii_or_npy, corsubs
+from funcs_correlate import crosscor, intersubcorr, load_nii_or_npy, corsubs, sum_tc
 from pietools import loadwith
 import yaml
 
-def rois(dlist, sub_indx, roi_maps, roi_out, roi_mat_out, ind_tc):
+def rois(dlist, sub_indx, roi_maps, roi_out, roi_mat_out, ind_tc, save_rois):
     """Calculate ISC and xcorr matrices for all ROIs, across last dimension
 
     Parameters:
@@ -35,6 +35,8 @@ def rois(dlist, sub_indx, roi_maps, roi_out, roi_mat_out, ind_tc):
             ccr_roi = crosscor(roi_tcs, standardized=False)     #crosscors from single ROI timecourse
             ROI_corr[key] = intersubcorr(ccr_roi)
             ROI_corrmat[key] = ccr_roi
+        if save_rois:
+            sio.savemat(save_rois+key, {sub : sub_roitc for sub, sub_roitc in zip(sub_indx, roi_tcs)})
 
     #SAVE ROIs
     ROI_corr['Folder'] = sub_indx
@@ -104,9 +106,14 @@ if __name__ == '__main__':
     roi_map = {roiname : nib.load(fname).get_data() for roiname, fname in cnfg['roi'].items()}
     roi_out = 'intersubj/isc_roi_%s%s.csv'%(condname, is_ind)
     roi_mat_out = 'intersubj/isc_roi_mat_%s%s'%(condname, is_ind)
-    rois(dlist, sub_indx, roi_map, roi_out, roi_mat_out, ind_tc)
+    rois(dlist, sub_indx, roi_map, roi_out, roi_mat_out, ind_tc, False)#, 'analysis/alph_rois/')
 
     #Whole-Brain Analysis
     ccr_out = 'intersubj/ccr_'+condname
     mean_c_out = 'intersubj/ccr_mean_'+condname+'.nii'
     isc(dlist, sub_indx, ccr_out, mean_c_out)
+
+    #save mean time course for each voxel
+#    mean_nii = nib.Nifti1Image(sum_tc(dlist), affine=None)              #modifies dlist in place
+#    nib.save(mean_nii, 'data/whole_brain_tc_%s.nii.gz'%condname)
+
