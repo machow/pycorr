@@ -53,7 +53,7 @@ def rois(dlist, sub_indx, roi_maps, roi_out, roi_mat_out, ind_tc, save_rois):
             np.savetxt(outfile, np.vstack(sub_indx).T, delimiter=',', fmt='%s')
             np.savetxt(outfile, roi, delimiter=',', fmt='%s')
 
-def isc(dlist, sub_indx, ccr_out, mean_c_out):
+def isc(dlist, sub_indx, ccr_out, mean_c_out, thresh=6000, mustpassprop=.7):
     """Calculate the [subject x subject] xcorr matrix for each voxel, as well as mean ISC per voxel.
 
     Parameters:
@@ -63,7 +63,9 @@ def isc(dlist, sub_indx, ccr_out, mean_c_out):
     mean_c_out - name for mean ISC output (.nii)
     """
     #FIND SUBS WITH MEAN TCs < 6000, STANDARDIZE DATA
-    below_thresh = map(lambda M: M.mean(axis=-1) < 6000, dlist)
+    n_min = mustpassprop * len(dlist)
+    below_thresh = map(lambda M: M.mean(axis=-1) < thresh, dlist)
+    thresh_fail = np.isna(below_thresh).sum(axis=-1) < n_min
 
     #WHOLE BRAIN SUBxSUB CORRELATION MATRIX
     C = crosscor(dlist, standardized = False)
@@ -73,6 +75,7 @@ def isc(dlist, sub_indx, ccr_out, mean_c_out):
 
     #Intersubject Correlations
     mean_C = nanmean(intersubcorr(C), axis=-1)
+    mean_C[thresh_fail] = np.NaN
     mean_C_nii = nib.Nifti1Image(mean_C, affine=None)
     print mean_C.shape
     sio.savemat(ccr_out, dict(CCR = C, sub_indx=sub_indx))

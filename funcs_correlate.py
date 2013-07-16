@@ -150,5 +150,5 @@ def roimask(data, roi, filter_func = None, proc_func = None, mean_ts = False):
     roi_indx = np.nonzero(roi)
     roi = data[roi_indx]
     if filter_func: roi = roi[filter_func(roi)]
-    if mean_ts: nanmean(roi, axis=0)
+    if mean_ts: roi = nanmean(roi, axis=0)
     return roi
