@@ -63,9 +63,10 @@ def isc(dlist, sub_indx, ccr_out, mean_c_out, thresh=6000, mustpassprop=.7):
     mean_c_out - name for mean ISC output (.nii)
     """
     #FIND SUBS WITH MEAN TCs < 6000, STANDARDIZE DATA
-    n_min = mustpassprop * len(dlist)
+    n_max = (1 - mustpassprop) * len(dlist)
     below_thresh = map(lambda M: M.mean(axis=-1) < thresh, dlist)
-    thresh_fail = np.isna(below_thresh).sum(axis=-1) < n_min
+    thresh_fail = np.sum(below_thresh, axis=0) > n_max 			#sum num of failed subjects per voxel
+    thresh_fail.shape
 
     #WHOLE BRAIN SUBxSUB CORRELATION MATRIX
     C = crosscor(dlist, standardized = False)
