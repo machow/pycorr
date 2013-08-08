@@ -146,9 +146,11 @@ def roimask(data, roi, filter_func = None, proc_func = None, mean_ts = False):
     proc_func -- TODO
 
     """
-
+    if type(roi) == str: roi = nib.load(roi).get_data()
+    shapes = roi.shape, data.shape
+    if roi.shape != data.shape[:len(roi.shape)]: raise BaseException('roi shape: %s \ndata shape: %s'%shapes)
     roi_indx = np.nonzero(roi)
     roi = data[roi_indx]
-    if filter_func: roi = roi[filter_func(roi)]
+    if filter_func: roi[filter_func(roi)] = np.nan
     if mean_ts: roi = nanmean(roi, axis=0)
     return roi

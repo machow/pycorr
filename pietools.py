@@ -47,11 +47,23 @@ def print_Blocks(dirname):
 
 
 def loadwith(subdir, path, func, **kwargs):
-    """For all subs in basedir, apply func to path, return list."""
+    """For all subs in basedir, apply func to path, return list.
+
+    Parameteres:
+    subdir --	base directory to iterate through. If none, just glob path.
+    path --	path to search for in each dir in subdir
+    func --	function to apply to each path found
+
+    """
     out = OrderedDict()
-    for sub in os.walk(subdir).next()[1]:
-        fname = os.path.join(subdir, sub, path)
-        out[sub] = func(fname, **kwargs)
+    if subdir:
+        for sub in os.walk(subdir).next()[1]:
+            fname = os.path.join(subdir, sub, path)
+            out[sub] = func(fname, **kwargs)
+    else:
+        fnames = glob(path)
+        for name in fnames:
+            out[name[:9]] = func(fname, **kwargs)
     return out
 #########
 ###
