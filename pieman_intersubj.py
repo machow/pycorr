@@ -107,10 +107,10 @@ if __name__ == '__main__':
         is_ind = ''
 
     #ROI Analysis
-    roi_map = {roiname : nib.load(fname).get_data() for roiname, fname in cnfg['roi'].items()}
-    roi_out = 'intersubj/isc_roi_%s%s.csv'%(condname, is_ind)
-    roi_mat_out = 'intersubj/isc_roi_mat_%s%s'%(condname, is_ind)
-    rois(dlist, sub_indx, roi_map, roi_out, roi_mat_out, ind_tc, False)#, 'analysis/alph_rois/')
+#    roi_map = {roiname : nib.load(fname).get_data() for roiname, fname in cnfg['roi'].items()}
+#    roi_out = 'intersubj/isc_roi_%s%s.csv'%(condname, is_ind)
+#    roi_mat_out = 'intersubj/isc_roi_mat_%s%s'%(condname, is_ind)
+#    rois(dlist, sub_indx, roi_map, roi_out, roi_mat_out, ind_tc, False)#, 'analysis/alph_rois/')
 
     #Whole-Brain Analysis
     ccr_out = 'intersubj/ccr_'+condname

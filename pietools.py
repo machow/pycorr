@@ -63,7 +63,8 @@ def loadwith(subdir, path, func, **kwargs):
     else:
         fnames = glob(path)
         for name in fnames:
-            out[name[:9]] = func(fname, **kwargs)
+            subj = os.path.split(name)[-1][:9]
+            out[subj] = func(name, **kwargs)
     return out
 #########
 ###
