@@ -53,7 +53,7 @@ def rois(dlist, sub_indx, roi_maps, roi_out, roi_mat_out, ind_tc, save_rois):
             np.savetxt(outfile, np.vstack(sub_indx).T, delimiter=',', fmt='%s')
             np.savetxt(outfile, roi, delimiter=',', fmt='%s')
 
-def isc(dlist, sub_indx, ccr_out, mean_c_out, thresh=6000, mustpassprop=.7):
+def isc(dlist, sub_indx, ccr_out, mean_c_out, thresh=6000, mustpassprop=.7, supersubj=None, superout=None):
     """Calculate the [subject x subject] xcorr matrix for each voxel, as well as mean ISC per voxel.
 
     Parameters:
@@ -63,16 +63,16 @@ def isc(dlist, sub_indx, ccr_out, mean_c_out, thresh=6000, mustpassprop=.7):
     mean_c_out - name for mean ISC output (.nii)
     """
     #FIND SUBS WITH MEAN TCs < 6000, STANDARDIZE DATA
-    n_max = (1 - mustpassprop) * len(dlist)
-    below_thresh = map(lambda M: M.mean(axis=-1) < thresh, dlist)
-    thresh_fail = np.sum(below_thresh, axis=0) > n_max 			#sum num of failed subjects per voxel
+    n_max = (mustpassprop) * len(dlist)
+    above_thresh = map(lambda M: M.mean(axis=-1) <= thresh, dlist)
+    thresh_fail = np.sum(above_thresh, axis=0) < n_max 			#sum num of failed subjects per voxel
     thresh_fail.shape
 
     #WHOLE BRAIN SUBxSUB CORRELATION MATRIX
     C = crosscor(dlist, standardized = False)
     for ii in range(len(dlist)):
-        C[below_thresh[ii], ii, :] = np.NaN                 #make entries that didn't meet threshold NA
-        C[below_thresh[ii], :, ii] = np.NaN
+        C[~above_thresh[ii], ii, :] = np.NaN                 #make entries that didn't meet threshold NA
+        C[~above_thresh[ii], :, ii] = np.NaN
 
     #Intersubject Correlations
     mean_C = nanmean(intersubcorr(C), axis=-1)
@@ -81,6 +81,13 @@ def isc(dlist, sub_indx, ccr_out, mean_c_out, thresh=6000, mustpassprop=.7):
     print mean_C.shape
     sio.savemat(ccr_out, dict(CCR = C, sub_indx=sub_indx))
     nib.save(mean_C_nii, mean_c_out)
+
+    #CORRELATE EACH SUB WITH SUPERSUB TC
+    if np.any(supersubj):
+        ISC_list = map(lambda X: corsubs(X, supersubj, standardized=False), dlist)
+        ISC_out = nanmean(ISC_list, axis=0)             #Mean ISC per voxel
+        ISC_out[thresh_fail] = np.NAN
+        nib.save(nib.Nifti1Image(ISC_out, affine=None), superout)
 
 if __name__ == '__main__':
     import sys
