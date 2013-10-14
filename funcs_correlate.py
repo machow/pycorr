@@ -45,10 +45,14 @@ def sub_isc(dlist, dsummed):
 
 def sum_tc(dlist, nans = True, standardize_subs=True, standardize_out=True):
     """Returns new timecourse from sum of all timecourses. Standardizes timecourses in place by default"""
-    if standardize_subs: standardize(dlist)         #operates in place, use with caution!
+    if standardize_subs: 
+        for sub in dlist: standardize(sub)         #operates in place, use with caution!
     newA = np.zeros(dlist[0].shape)
     if nans:
-        newA = np.nansum(dlist, axis=0)
+        for entry in dlist: 
+            tmp_entry = entry.copy()
+            tmp_entry[np.isnan(tmp_entry)] = 0
+            newA += tmp_entry
     else:
         for entry in dlist: newA += entry
     if standardize_out: standardize(newA)
@@ -147,10 +151,39 @@ def roimask(data, roi, filter_func = None, proc_func = None, mean_ts = False):
 
     """
     if type(roi) == str: roi = nib.load(roi).get_data()
+    if len(roi.shape) > 3: roi = roi[:,:,:,0]
     shapes = roi.shape, data.shape
-    if roi.shape != data.shape[:len(roi.shape)]: raise BaseException('roi shape: %s \ndata shape: %s'%shapes)
+    if roi.shape[:3] != data.shape[:3]: raise BaseException('roi shape: %s \ndata shape: %s'%shapes)
     roi_indx = np.nonzero(roi)
     roi = data[roi_indx]
     if filter_func: roi[filter_func(roi)] = np.nan
     if mean_ts: roi = nanmean(roi, axis=0)
     return roi
+
+
+def load_roi(nii, thresh=6000, standardize=True, outlen=None, padding=np.mean, meantc=False):
+    """Load a nifti file and apply several functions to it.
+
+    nii -- name of nifti to load or ndarray
+    standardize -- return all tcs with mean = 0 and stdev = 1
+    outlen -- specify how long resultant tcs should be, pad if necessary
+    padding -- function to apply to ndarray, must take axis=-1 argument
+    meantc -- return the meantc over all voxels (before evaluating standardize)
+
+    TODO: fix default outlen arg
+
+    """
+    if not hasattr(nii, 'shape'): nii = nib.load(nii).get_data()
+    nii[nii.mean(axis=-1) < thresh] = np.nan
+
+    if meantc: out = nanmean(nii.reshape([-1, nii.shape[-1]]), axis=0)  #USE apply_over_axes instead?
+    else: out = nii
+
+    if standardize: out = (out - out.mean(axis=-1)[..., np.newaxis]) / out.std(axis=-1, ddof=1)[..., np.newaxis] #this is unruly, use the current standardize func
+    outdiff = outlen - out.shape[-1]
+    if outdiff >= 0:
+        if hasattr(padding, 'func_name'): padding = padding(out, axis=-1)[..., np.newaxis]    #call padding if it is a function
+        out = np.concatenate([out] + [padding]*outdiff, axis=-1)
+    else: 
+        out = out[..., :outlen] 
+    return out

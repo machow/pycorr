@@ -53,7 +53,7 @@ def rois(dlist, sub_indx, roi_maps, roi_out, roi_mat_out, ind_tc, save_rois):
             np.savetxt(outfile, np.vstack(sub_indx).T, delimiter=',', fmt='%s')
             np.savetxt(outfile, roi, delimiter=',', fmt='%s')
 
-def isc(dlist, sub_indx, ccr_out, mean_c_out, thresh=6000, mustpassprop=.7):
+def isc(dlist, sub_indx, thresh=6000, mustpassprop=.7, ccr_out="", mean_c_out="", mean_out="", supersubj=None, super_out=""):
     """Calculate the [subject x subject] xcorr matrix for each voxel, as well as mean ISC per voxel.
 
     Parameters:
@@ -61,26 +61,45 @@ def isc(dlist, sub_indx, ccr_out, mean_c_out, thresh=6000, mustpassprop=.7):
     sub_indx - names corresponding to arrays in dlist (for output)
     ccr_out - name for xcorr matrix output (.mat)
     mean_c_out - name for mean ISC output (.nii)
+    mean_out - name for mean timecourse at each voxel
+    supersubj - nifti for supersubject to do between group ISC
     """
     #FIND SUBS WITH MEAN TCs < 6000, STANDARDIZE DATA
-    n_max = (1 - mustpassprop) * len(dlist)
-    below_thresh = map(lambda M: M.mean(axis=-1) < thresh, dlist)
-    thresh_fail = np.sum(below_thresh, axis=0) > n_max 			#sum num of failed subjects per voxel
+    n_max = (mustpassprop) * len(dlist)
+    above_thresh = map(lambda M: M.mean(axis=-1) >= thresh, dlist)
+    thresh_fail = np.sum(above_thresh, axis=0) < n_max 			#sum num of failed subjects per voxel
+    print 'n_max: ', n_max
+    for entry in above_thresh:
+        print entry.shape
     thresh_fail.shape
 
-    #WHOLE BRAIN SUBxSUB CORRELATION MATRIX
-    C = crosscor(dlist, standardized = False)
-    for ii in range(len(dlist)):
-        C[below_thresh[ii], ii, :] = np.NaN                 #make entries that didn't meet threshold NA
-        C[below_thresh[ii], :, ii] = np.NaN
+    if mean_c_out or ccr_out:
+        #WHOLE BRAIN SUBxSUB CORRELATION MATRIX
+        C = crosscor(dlist, standardized = False)
+        for ii in range(len(dlist)):
+            C[~above_thresh[ii], ii, :] = np.NaN                 #make entries that didn't meet threshold NA
+            C[~above_thresh[ii], :, ii] = np.NaN
 
-    #Intersubject Correlations
-    mean_C = nanmean(intersubcorr(C), axis=-1)
-    mean_C[thresh_fail] = np.NaN
-    mean_C_nii = nib.Nifti1Image(mean_C, affine=None)
-    print mean_C.shape
-    sio.savemat(ccr_out, dict(CCR = C, sub_indx=sub_indx))
-    nib.save(mean_C_nii, mean_c_out)
+        #Intersubject Correlations
+        mean_C = nanmean(intersubcorr(C), axis=-1)
+        mean_C[thresh_fail] = np.NaN
+        mean_C_nii = nib.Nifti1Image(mean_C, affine=None)
+        print mean_C.shape
+        if ccr_out: sio.savemat(ccr_out, dict(CCR = C, sub_indx=sub_indx))
+        if mean_c_out: nib.save(mean_C_nii, mean_c_out)
+
+    if mean_out:
+        mean = sum_tc(dlist)                #Standardizes dlist
+        mean[thresh_fail] = np.NaN
+        nib.save(nib.Nifti1Image(mean, affine=None), mean_out)
+
+
+    #CORRELATE EACH SUB WITH SUPERSUB TC
+    if np.any(supersubj):
+        ISC_list = map(lambda X: corsubs(X, supersubj, standardized=False), dlist)
+        ISC_out = nanmean(ISC_list, axis=0)             #Mean ISC per voxel
+        ISC_out[thresh_fail] = np.NAN
+        nib.save(nib.Nifti1Image(ISC_out, affine=None), super_out)
 
 if __name__ == '__main__':
     import sys
@@ -99,8 +118,8 @@ if __name__ == '__main__':
     dlist = [ddict[sub] for sub in sub_indx]            #list ordered by sub name
 
     #LOAD SUPERSUBJECT (if using)
-    if cond['calc_ind']:
-        ind_tc = load_nii_or_npy(cond['ind_tc'])         	    #independent timecourse if specified
+    if cond['supersubj']:
+        ind_tc = load_nii_or_npy(cond['supersubj'])         	    #independent timecourse if specified
         is_ind = '_ind'
     else:
         ind_tc = False
@@ -113,9 +132,12 @@ if __name__ == '__main__':
 #    rois(dlist, sub_indx, roi_map, roi_out, roi_mat_out, ind_tc, False)#, 'analysis/alph_rois/')
 
     #Whole-Brain Analysis
-    ccr_out = 'intersubj/ccr_'+condname
-    mean_c_out = 'intersubj/ccr_mean_'+condname+'.nii'
-    isc(dlist, sub_indx, ccr_out, mean_c_out)
+    out = dict(
+                ccr_out = 'intersubj/ccr_'+condname,
+                mean_c_out = 'intersubj/ccr_mean_'+condname+'.nii',
+                mean_out = 'data/supersubj/mean_'+condname+'.nii',
+                super_out = 'intersubj/ccr_mean_supersubj_'+condname+'.nii')
+    isc(dlist, sub_indx, supersubj=ind_tc, **out)
 
     #save mean time course for each voxel
 #    mean_nii = nib.Nifti1Image(sum_tc(dlist), affine=None)              #modifies dlist in place
