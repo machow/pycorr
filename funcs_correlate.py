@@ -10,17 +10,20 @@ import os
 from itertools import combinations
 from scipy.stats.stats import nanmean
 
-def standardize(A, axis = -1, demean = True, devar = True):
+def standardize(A, axis = -1, demean = True, devar = True, inplace=False):
     """Subtract mean, divide standard deviation (z-scoring).  Operate in-place.
-
-    TODO: fix so that axis doesn't have to be last
-          return SD, so that diagonals can be replaced with meaningful information
-
     """
-    if demean:
-        A -= np.mean(A, axis = axis)[..., np.newaxis]
-    if devar:
-        A /= np.std(A, axis = axis)[..., np.newaxis]
+    m  = np.expand_dims(np.mean(A, axis),         axis)
+    sd = np.expand_dims( np.std(A, axis, ddof=1), axis)
+    if inplace and 'f' in A.dtype.str:                   #make sure A is float
+        #inplace operations
+        if demean: A -= m
+        if devar:  A /= sd
+    else:
+        #copy operations
+        if demean: A = A - m
+        if devar:  A = A / sd
+    return A
 
 
 
@@ -34,11 +37,11 @@ def corsubs(A, B, axis = -1, standardized = False):
     TODO: generalize axis argument
 
     """
-    n = A.shape[axis]
-    if standardized: return np.sum(A * B, axis) / n
+    n_df = A.shape[axis] - 1
+    if standardized: return np.sum(A * B, axis) / n_df
     else:
         demean = lambda M: M - np.mean(M, axis = axis)[..., np.newaxis]         #TODO here
-        return np.sum(demean(A) * demean(B), axis) / ( np.std(A, axis)*np.std(B,axis) * n )
+        return np.sum(demean(A) * demean(B), axis) / ( np.std(A, axis, ddof=1)*np.std(B,axis, ddof=1) * n_df )
 
 def sub_isc(dlist, dsummed):
     return np.array([corsubs(entry, dsummed-entry) for entry in dlist])
@@ -46,7 +49,7 @@ def sub_isc(dlist, dsummed):
 def sum_tc(dlist, nans = True, standardize_subs=True, standardize_out=True):
     """Returns new timecourse from sum of all timecourses. Standardizes timecourses in place by default"""
     if standardize_subs: 
-        for sub in dlist: standardize(sub)         #operates in place, use with caution!
+        for sub in dlist: standardize(sub, inplace=True)         #operates in place, use with caution!
     newA = np.zeros(dlist[0].shape)
     if nans:
         for entry in dlist: 
@@ -55,7 +58,7 @@ def sum_tc(dlist, nans = True, standardize_subs=True, standardize_out=True):
             newA += tmp_entry
     else:
         for entry in dlist: newA += entry
-    if standardize_out: standardize(newA)
+    if standardize_out: standardize(newA, inplace=True)
     return newA
 
 def intersubcorr(C_all, excludeself = True):

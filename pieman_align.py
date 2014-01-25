@@ -60,7 +60,7 @@ if shiftfile:
 
 #LOAD TIME COURSES FOR XCORR
 Mlist = Mdict.values()                                          #subject tc's
-for entry in Mlist: standardize(entry)
+for entry in Mlist: standardize(entry, inplace=True)
 M_aud = sio.loadmat(aud_env)['audenv'].reshape(280)     #audio envelope
 M_meantc = np.vstack(Mlist).sum(axis=0)                         #mean tc
 
