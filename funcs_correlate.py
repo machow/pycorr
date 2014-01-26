@@ -40,8 +40,9 @@ def corsubs(A, B, axis = -1, standardized = False):
     n_df = A.shape[axis] - 1
     if standardized: return np.sum(A * B, axis) / n_df
     else:
-        demean = lambda M: M - np.mean(M, axis = axis)[..., np.newaxis]         #TODO here
-        return np.sum(demean(A) * demean(B), axis) / ( np.std(A, axis, ddof=1)*np.std(B,axis, ddof=1) * n_df )
+        demean = lambda M: M - np.mean(M, axis = axis, keepdims=True)
+        std    = lambda M: M.std(axis, ddof=1)
+        return np.sum(demean(A) * demean(B), axis) / (std(A)*std(B) * n_df)
 
 def sub_isc(dlist, dsummed):
     return np.array([corsubs(entry, dsummed-entry) for entry in dlist])
