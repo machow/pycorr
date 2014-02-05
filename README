@@ -1,0 +1,19 @@
+TODO
+    Quick:
+        1. update of funcs_correlate
+        2. unit tests for sum_tc, shift, etc..
+    Extensive:
+        1. class for handling IO
+        2. yaml uses str.format
+        3. update
+            Align (yield?)
+            Shift (yield?)
+            ISC (rewrite ROI script)
+        4. Make into package (__init__.py)
+        5. command-line interface
+    Down the Road:
+        1. ROI event plots
+        2. Class for unscrambling, subsetting?
+        3. Bootstrap
+        4. GUI
+        5. SEM
