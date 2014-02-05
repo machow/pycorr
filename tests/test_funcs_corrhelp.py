@@ -47,6 +47,9 @@ class test_corsubs:
     """
     Test funcs_correlate.corsubs
     TODO: find better 3-dimensional array to test (anscombe only to 3 decimal prec
+
+    Contains a suite of x,y pairs along with their correlations. Data is formatted as..
+    x,y, solution, decimal accuracy
     """
     @classmethod
     def setup_class(self): 
@@ -71,11 +74,11 @@ class test_corsubs:
         self.b_3dim = np.array([v[1] for k, v in self.ts.iteritems() if k in test])
         self.corrs_3dim = np.array([v[2] for k, v in self.ts.iteritems() if k in test])
 
-    def test_cor_expected_unstandardized(self):
+    def test_cor_expected_unstandardized(self):             #test all correlations
         for k, v in self.ts.iteritems():
             yield self.cor_expected, k
 
-    def test_cor_expected_standardized(self):
+    def test_cor_expected_standardized(self):               #test correlations with 'stan' in key
         for k, v in self.ts.iteritems():
             if 'stand' in k: 
                 yield self.cor_expected, k, False
@@ -86,7 +89,7 @@ class test_corsubs:
         corr = corsubs(x,y, standardized=standardize)
         assert_almost_equal(corr, sol, decimal=decimal)
 
-    def test_lagcor_equal_subcor(self):
+    def test_lagcor_equal_subcor(self):                     #similar to above tests, but check lagcor == subcor
         for k, v in self.ts.iteritems():
             yield self.lagcor_equal_subcor, k
 
@@ -100,7 +103,7 @@ class test_corsubs:
         assert_almost_equal(lagcor(x,y,0), corsubs(x,y))
 
 
-    def test_cor_3d(self):
+    def test_cor_3d(self):                                  #test against all data in giant 3d mat
         assert_almost_equal(corsubs(self.a_3dim, self.b_3dim), self.corrs_3dim, decimal=3)
 
     def test_axis_arg(self):
