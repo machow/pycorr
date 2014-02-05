@@ -1,5 +1,5 @@
 import numpy as np
-from funcs_correlate import standardize, corsubs, lagcor
+from funcs_correlate import standardize, corsubs, lagcor, sum_tc, shift, trim
 from numpy.testing import assert_almost_equal
 import os
 
@@ -123,8 +123,71 @@ class test_corsubs:
 
 class test_lagcor:
     def setup(self):
-        pass
+        self.a = np.arange(10.).reshape([2,5])
+        self.b = np.array(range(5) + range(10,15)).reshape([2,5])
+        print self.a
 
     def test_lagcor_equal_shift(self):
-        pass
+        for ii in range(4):
+            yield self.lagcor_is_shiftcor, ii
 
+    def lagcor_is_shiftcor(self, h):
+        a = self.a
+        b = self.b
+        outlen = a.shape[-1]-h
+        assert_almost_equal(lagcor(a, b, h), 
+                            corsubs(shift(a, h), shift(b, 0, outlen)))
+
+    def test_lagcor_equal_trim(self):
+        for ii in range(4):
+            yield self.lagcor_is_trimcor, ii
+
+    def lagcor_is_trimcor(self, h):
+        a = self.a
+        b = self.b
+        assert_almost_equal(lagcor(a,b,h),
+                            corsubs(trim(a, h=h), trim(b, h=-h)))
+
+
+
+
+class test_sumtc:
+    def setup(self):
+        self.a = np.arange(10.).reshape([2,5])
+        self.a_int = np.arange(10).reshape([2,5])
+        self.ts_3d = np.arange(16.).reshape([4,2,2])
+
+    def test_standardize_not_inplace(self):
+        assert sum_tc(self.a, standardize_subs=True) is not self.a
+
+    def test_standardize_out_mean(self):
+        mew = np.mean(sum_tc(self.a, standardize_out=True), axis=-1)
+        assert_almost_equal(0, mew)
+
+    def test_standardize_out_var(self):
+        sd = np.std(sum_tc(self.a, standardize_out=True), axis=-1, ddof=1)
+        assert_almost_equal(1, sd)
+
+
+    def test_standardize_out_equal_standardize_func(self):
+        summed = sum_tc(self.a, standardize_out=True)
+        assert_almost_equal(summed, standardize(summed))
+
+    def test_standardize_in_equal_standardize_func(self):
+        stand_a = standardize(self.a)
+        assert_almost_equal(sum_tc(self.a, standardize_subs=True),
+                            sum_tc(stand_a, standardize_subs=False))
+
+    def test_nan_misflag_returns_nan(self):
+        ts_nan = self.a.copy()
+        ts_nan[:,0] = np.nan
+        assert any(np.isnan(sum_tc(ts_nan, nans=False, standardize_subs=False, standardize_out=False)))
+
+    def test_nan_flag_equals_noflag(self):
+        assert_almost_equal(sum_tc(self.a, nans = True, standardize_subs=False, standardize_out=False), 
+                            sum_tc(self.a, nans=False, standardize_subs=False, standardize_out=False))
+
+    def test_3d(self):
+        solution= [[ 24.,  28.],
+                   [ 32.,  36.]]
+        assert_almost_equal(sum_tc(self.ts_3d), solution)

@@ -1,7 +1,7 @@
 TODO
     Quick:
         1. update of funcs_correlate
-        2. unit tests for sum_tc, shift, etc..
+        2. unit tests load_roi and roi_mask (should rethink these functions)
     Extensive:
         1. class for handling IO
         2. yaml uses str.format
