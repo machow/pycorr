@@ -8,7 +8,7 @@ import numpy as np
 from scipy import io as sio
 from scipy.stats.stats import nanmean
 import nibabel as nib
-from funcs_correlate import crosscor, intersubcorr, load_nii_or_npy, corsubs, sum_tc
+from funcs_correlate import crosscor, intersubcorr, load_nii_or_npy, corsubs, sum_tc, standardize
 from pietools import loadwith
 import yaml
 
@@ -89,7 +89,8 @@ def isc(dlist, sub_indx, thresh=6000, mustpassprop=.7, ccr_out="", mean_c_out=""
         if mean_c_out: nib.save(mean_C_nii, mean_c_out)
 
     if mean_out:
-        mean = sum_tc(dlist)                #Standardizes dlist
+        standardize(dlist, inplace=True)
+        mean = sum_tc(dlist, standardize_out=True)
         mean[thresh_fail] = np.NaN
         nib.save(nib.Nifti1Image(mean, affine=None), mean_out)
 

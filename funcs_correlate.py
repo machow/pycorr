@@ -47,10 +47,10 @@ def corsubs(A, B, axis = -1, standardized = False):
 def sub_isc(dlist, dsummed):
     return np.array([corsubs(entry, dsummed-entry) for entry in dlist])
 
-def sum_tc(dlist, nans = True, standardize_subs=True, standardize_out=True):
-    """Returns new timecourse from sum of all timecourses. Standardizes timecourses in place by default"""
+def sum_tc(dlist, nans = True, standardize_subs=False, standardize_out=False):
+    """Returns new timecourse from sum of all timecourses.""" 
     if standardize_subs: 
-        for sub in dlist: standardize(sub, inplace=True)         #operates in place, use with caution!
+        dlist = [standardize(sub, inplace=False) for sub in dlist]
     newA = np.zeros(dlist[0].shape)
     if nans:
         for entry in dlist: 
@@ -118,24 +118,24 @@ def lagcor(A, B, h, axis=-1, standardized=False, offset=0):
     return corsubs(A[..., h:a_max], B[...,:b_max], axis, standardized)
 
 
-def trim(A, ends=[0, 0], h=None):
+def trim(A, ends=(0, 0), h=None):
     """Returns Array with last dim trimmed
 
     Parameters:
     A -- n-dim array
     ends -- how much trim from each end, e.g. (10, -10)
-    h -- specify how much to trim from one side.
+    h -- specify how much to trim from one side. Overrides that argument in ends.
 
     """
-
-    if h: ends[h < 0] = h
+    ends = list(ends)
+    ends[h < 0] = h
     return A[..., ends[0] : ends[1] or None]
 
-def shift(A, h, outlen, offset=0):
+def shift(A, h, outlen=None, offset=0):
     """Shifts entire time series by h"""
     h -= offset
     if h < 0: raise BaseException('after adjusting for offset, h is negative.  Cannot keep outlen.')
-    return A[..., h : outlen+h]
+    return A[..., h : outlen and outlen+h]
 
 
 def load_nii_or_npy(fname):
