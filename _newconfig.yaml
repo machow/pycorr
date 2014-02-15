@@ -1,0 +1,33 @@
+#GENERAL SETTINGS
+base_dir: 'tests/data/subjects'
+
+#GROUP SETTINGS
+rois:
+    roi_files: "rois/{roi_id}.nii*"
+
+
+conds:
+    # Cond should carry subject dir information, but Subjects in hdf used to group runs
+    intact:
+        nii_files: "{sub_id}/intact/*nii*"
+        audio_env: ""
+        notes: ""
+        #Stims folder?
+        offset: 0
+        max_len: ""
+        threshold: 6000
+
+        blocks:
+            slum: path/to/slum
+            over: path/to/over
+    
+    wordscram:
+        nii_files: "{sub_id}/wordscram/*nii*"
+        audio_env: ""
+        notes: "Pieman story scrambled at the word level"
+        
+        offset: 10
+        max_len: 280
+        threshold: 6000
+
+subjects:
