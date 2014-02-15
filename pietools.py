@@ -1,11 +1,35 @@
 from os import path, walk
 import os
 from glob import glob
-import argparse
 import fnmatch
 try: import dicom
 except: "lib 'dicom' unavailable"
-from collections import Counter, OrderedDict
+from collections import OrderedDict
+import re
+import nibabel as nib
+
+def load_nii_or_npy(fname):
+    """convenience function to load nib or np filetypes"""
+    if os.path.splitext(fname)[1] == '.npy': return np.load(fname)
+    else: return nib.load(fname).get_data()
+
+
+
+def query_to_re_groups(query):
+    """For a string with with glob syntax, allow for named groups for wildcards
+    
+    E.g. "*/{sub_id}/file.txt" is converted to a regular expression where {sub_id} is a wildcard,
+         and it's match is a group named sub_id.
+        
+    Supports multiple {bracketed_args}
+    """
+    var_matches = re.finditer('{(?P<var>.*?)}', query)
+    re_exp = fnmatch.translate(query)
+    for m in var_matches: 
+        re_group_exp = '(?P<%s>.*?)'%m.groupdict()['var']
+        re_exp = re_exp.replace(re.escape(m.group()), re_group_exp)
+    return re_exp
+
 
 def subs_getfile(dirname, matchme, verbose = False):
     """Recursively find all matching files, return as dictionary with entry for each subdir

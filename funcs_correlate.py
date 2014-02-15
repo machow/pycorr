@@ -131,17 +131,11 @@ def trim(A, ends=(0, 0), h=None):
     ends[h < 0] = h
     return A[..., ends[0] : ends[1] or None]
 
-def shift(A, h, outlen=None, offset=0):
+def shift(A, h, outlen=None, offset=0):             #TODO remove offset arg?
     """Shifts entire time series by h"""
     h -= offset
     if h < 0: raise BaseException('after adjusting for offset, h is negative.  Cannot keep outlen.')
     return A[..., h : outlen and outlen+h]
-
-
-def load_nii_or_npy(fname):
-    """convenience function to load nib or np filetypes"""
-    if os.path.splitext(fname)[1] == '.npy': return np.load(fname)
-    else: return nib.load(fname).get_data()
 
 
 def roimask(data, roi, filter_func = None, proc_func = None, mean_ts = False):
