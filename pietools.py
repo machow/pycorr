@@ -7,6 +7,7 @@ except: "lib 'dicom' unavailable"
 from collections import OrderedDict
 import re
 import nibabel as nib
+import numpy as np
 
 def load_nii_or_npy(fname):
     """convenience function to load nib or np filetypes"""
@@ -24,11 +25,13 @@ def query_to_re_groups(query):
     Supports multiple {bracketed_args}
     """
     var_matches = re.finditer('{(?P<var>.*?)}', query)
+    glob_exp = query
     re_exp = fnmatch.translate(query)
     for m in var_matches: 
+        glob_exp = glob_exp.format(**{m.groupdict()['var']: '*'})
         re_group_exp = '(?P<%s>.*?)'%m.groupdict()['var']
         re_exp = re_exp.replace(re.escape(m.group()), re_group_exp)
-    return re_exp
+    return glob_exp, re_exp
 
 
 def subs_getfile(dirname, matchme, verbose = False):
