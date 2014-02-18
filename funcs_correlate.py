@@ -6,8 +6,7 @@
 
 import numpy as np
 import nibabel as nib
-import os
-from itertools import combinations
+from itertools import combinations, product
 from scipy.stats.stats import nanmean
 
 def standardize(A, axis = -1, demean = True, devar = True, inplace=False):
@@ -44,14 +43,15 @@ def corsubs(A, B, axis = -1, standardized = False):
         std    = lambda M: M.std(axis, ddof=1)
         return np.sum(demean(A) * demean(B), axis) / (std(A)*std(B) * n_df)
 
-def sub_isc(dlist, dsummed):
-    return np.array([corsubs(entry, dsummed-entry) for entry in dlist])
+def corcomposite(sub, dsummed):
+    """Convenience function for correlating subject with a composite it is part of"""
+    return corsubs(sub, dsummed-sub)
 
-def sum_tc(dlist, nans = True, standardize_subs=False, standardize_out=False):
+def sum_tc(dlist, nans = True, standardize_subs=False, standardize_out=False, shape=None):
     """Returns new timecourse from sum of all timecourses.""" 
+    newA = np.zeros(shape or dlist[0].shape)
     if standardize_subs: 
-        dlist = [standardize(sub, inplace=False) for sub in dlist]
-    newA = np.zeros(dlist[0].shape)
+        dlist = (standardize(sub, inplace=False) for sub in dlist)
     if nans:
         for entry in dlist: 
             tmp_entry = entry.copy()
@@ -82,16 +82,29 @@ def intersubcorr(C_all, excludeself = True):
         return covcolsums / np.sqrt(covttl)
 
 
-def crosscor(dlist, standardized = True):
+def crosscor(dlist, B=None, standardized = True):
     """Takes list of subject data, returns matrix of correlation matrices at each voxel."""
-    N = len(dlist)
-    dims = list(dlist[0].shape[:-1]) + [N,N]   #collapsed across time, expanded #subs x #subs
-    C_all = np.zeros(dims)
-    for ii, jj in combinations(range(N), 2):
-        C_all[..., ii, jj] = corsubs(dlist[ii], dlist[jj], standardized = standardized)
+    if not np.any(B):
+        N = len(dlist)
+        dims = list(dlist[0].shape[:-1]) + [N,N]   #collapsed across time, expanded #subs x #subs
+        C_all = np.zeros(dims)
+        for ii, jj in combinations(range(N), 2):   #just need to loop through upper triangle, then use transpose
+            C_all[..., ii, jj] = corsubs(dlist[ii], dlist[jj], standardized = standardized)    #diagonal not filled
 
-    C_all += C_all.transpose(range(len(dims)-2) + [-1,-2]) + np.eye(C_all.shape[-1])       #Fill in symmetry
-    return C_all
+        C_all += C_all.transpose(range(len(dims)-2) + [-1,-2]) + np.eye(C_all.shape[-1])       #Fill in symmetry and diag
+        return C_all
+
+    else:
+        #Second list is provided, calculate all cross-correlations
+        #can't use symmetry, so must loop through the cartesian product
+        N_a, N_b = len(dlist), len(B)
+        dims = list(dlist[0].shape[:-1]) + [N_a, N_b]
+        C_all = np.zeros(dims)
+        for ii, jj in product(range(N_a), range(N_b)):
+            C_all[..., ii, jj] = corsubs(dlist[ii], B[jj], standardized=standardized)
+        return C_all
+
+
 
 
 def lagcor(A, B, h, axis=-1, standardized=False, offset=0):
