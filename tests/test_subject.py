@@ -3,17 +3,17 @@ if os.path.isfile('test.h5'): os.remove('test.h5')
 
 import h5py, yaml
 import numpy as np
-from funcs_correlate import lagcor
-import workflows
-reload(workflows)
-from workflows import isc_within, isc_between
-import subject
-reload(subject)
+from pieman.funcs_correlate import lagcor
+import pieman.workflows
+reload(pieman.workflows)
+from pieman.workflows import isc_within, isc_between
+import pieman.subject as subject
+reload(pieman.subject)
 
 f = h5py.File('test.h5')
 E = subject.Exp(f)
 
-config = yaml.load(open('_newconfig.yaml'))
+config = yaml.load(open('config.yaml'))
 E.setup(config, create_conds=True)
 for condname in config['conds']:
     cond = E.get_cond(condname)
