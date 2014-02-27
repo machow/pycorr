@@ -140,6 +140,7 @@ class Exp:
         cond.attrs['offset'] = offset
         cond.attrs['max_len'] = max_len
         cond.attrs['threshold'] = threshold
+        cond.attrs['prop_pass_thresh'] = .7
         cond.create_group('blocks')
         cond.create_group('correlations')
         cond.create_group('analyses')
@@ -157,7 +158,7 @@ class Exp:
             fname = m.group()
             sub_id = m.groupdict()['sub_id']
             print fname, sub_id
-            self.create_subrun(sub_id, condname, fname, **cond)
+            self.create_subrun(sub_id, condname, fname, **cond.attrs)
             #have option to do threshold?
             self.f.flush()
         #TODO blocks (pandas)
@@ -196,13 +197,13 @@ class Exp:
         #TODO overwrite
         data = (run.load(standardized=True, threshold=True) for run in self.iter_runs(condname))
         shape = self.iter_runs(condname).next().load().shape
-        composite = sum_tc(data, shape=shape, standardize_out=True)
+        composite = sum_tc(data, shape=shape, standardize_out=False)
         self.get_cond(condname).create_dataset('composite', data=composite)
 
     def gen_cond_thresh(self, condname, overwrite=False):
         cond = self.get_cond(condname)
 
-        dlist = (~run.thresh[...] for run in self.iter_runs(condname))              #all that pass threshold
+        dlist = [~run.thresh[...] for run in self.iter_runs(condname)]              #all that pass threshold
         mustpassprop = cond.attrs['prop_pass_thresh']
         n_must_pass = (mustpassprop) * len(dlist)
         above_thresh = np.sum(dlist, axis=0)
