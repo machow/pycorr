@@ -1,6 +1,6 @@
 #
 #GENERAL SETTINGS
-roi_files: "tests/data/fullpipe/rois/{roi_id}.nii*"
+roi_files: "pipeline/rois/{roi_id}.nii*"
 sub_folder: subjects
 
 #GROUP SETTINGS
@@ -9,7 +9,7 @@ rois:
 
 conds:
     wordscram:
-        base_dir: 'tests/data/fullpipe/subjects'
+        base_dir: 'pipeline/subjects'
         nii_files: "{sub_id}/short_wordscram/*nii*"
         audio_env: "aud_env_wordscram.npy"
         prop_pass_thresh: .70
@@ -20,7 +20,7 @@ conds:
         threshold: 6000
 
     wordscram2:
-        base_dir: 'tests/data/fullpipe/subjects'
+        base_dir: 'pipeline/subjects'
         nii_files: "{sub_id}/short_wordscram/*nii*"
         audio_env: "aud_env_wordscram.npy"
         prop_pass_thresh: .70
