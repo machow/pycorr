@@ -199,7 +199,7 @@ class Exp:
         shape = self.iter_runs(condname).next().load().shape
         composite = sum_tc(data, shape=shape, standardize_out=False)
         cond = self.get_cond(condname)
-        dset = cond.require_dataset('composite', shape=composite.shape)
+        dset = cond.require_dataset('composite', shape=composite.shape, dtype=composite.dtype)
         dset[...] = composite
 
     def gen_cond_thresh(self, condname, overwrite=False):
