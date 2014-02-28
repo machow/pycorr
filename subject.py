@@ -198,7 +198,9 @@ class Exp:
         data = (run.load(standardized=True, threshold=True) for run in self.iter_runs(condname))
         shape = self.iter_runs(condname).next().load().shape
         composite = sum_tc(data, shape=shape, standardize_out=False)
-        self.get_cond(condname).create_dataset('composite', data=composite)
+        cond = self.get_cond(condname)
+        dset = cond.require_dataset('composite', shape=composite.shape)
+        dset[...] = composite
 
     def gen_cond_thresh(self, condname, overwrite=False):
         cond = self.get_cond(condname)
