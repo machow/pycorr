@@ -48,7 +48,7 @@ class Run:
         May fail if data contains nans
         """
         data = data if np.any(data) else self.load()
-        thresh_mask = data.mean(axis=-1) < threshold
+        thresh_mask = ~(data.mean(axis=-1) > threshold)    #thresh anything not over threshold (including nan)
         
         if save:
             self.thresh = self.grp.require_dataset('thresh', shape=self.data.shape[:-1], dtype=bool)
