@@ -110,6 +110,9 @@ class Exp:
     def __init__(self, f):
         self.f = h5py.File(f) if type(f) is str else f
 
+    def __getitem__(self, x):
+        return self.f['conds'][x]
+
     def setup(self, config, create_conds=False):
         #if 'data_storage' in config:
         #    for k,v in config['data_storage'].iteritems():
