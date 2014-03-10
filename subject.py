@@ -31,7 +31,7 @@ class Run:
             M_roi = self.data[...][roi]    #Have to load into mem :(
             shifted = shift(M_roi, h=self.data.attrs['offset'], outlen=self.data.attrs['max_len'])   #shift last dim forward h
             if standardized: standardize(shifted, inplace=True)
-            return standardize(shifted.mean(axis=0))
+            return standardize(shifted.mean(axis=0))           #restandardize, and collapse the vox X ts 2D mat
         else: 
             shifted = shift(self.data, h=self.data.attrs['offset'], outlen=self.data.attrs['max_len'])   #shift last dim forward h
 
@@ -138,7 +138,7 @@ class Exp:
         self.f.flush()
 
     def create_cond(self, condname, offset=0, max_len=None, threshold=0, audio_env=None, 
-                    base_dir="", nii_files=None, **kwargs):
+                    base_dir="", nii_files=None, dry_run=False, **kwargs):
         cond = self.f['conds'].create_group(condname)
         cond.attrs['offset'] = offset
         cond.attrs['max_len'] = max_len
@@ -161,10 +161,13 @@ class Exp:
             fname = m.group()
             sub_id = m.groupdict()['sub_id']
             print fname, sub_id
-            self.create_subrun(sub_id, condname, fname, **cond.attrs)
+            if not dry_run: self.create_subrun(sub_id, condname, fname, **cond.attrs)
             #have option to do threshold?
             self.f.flush()
         #TODO blocks (pandas)
+        if dry_run:
+            for k, v in cond.attrs.iteritems(): print k, ':\t\t', v
+            del self.f[cond.name]
         return cond
     
     def create_subrun(self, sub_id, condname, fname_or_arr, ref=False, **kwargs):
