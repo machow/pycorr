@@ -1,4 +1,5 @@
 import h5py
+        if group: cond.attrs['group'] = group
 import nibabel as nib
 from funcs_correlate import shift, standardize
 from pietools import load_nii_or_npy
@@ -137,14 +138,14 @@ class Exp:
                 self.create_cond(condname, **cond)
         self.f.flush()
 
-    def create_cond(self, condname, run, group=None, offset=0, max_len=None, threshold=0, audio_env=None, 
+    def create_cond(self, condname, run=None, group=None, offset=0, max_len=None, threshold=0, audio_env=None, 
                     base_dir="", nii_files=None, dry_run=False, **kwargs):
         cond = self.f['conds'].create_group(condname)
         cond.attrs['offset'] = offset
         cond.attrs['max_len'] = max_len
         cond.attrs['threshold'] = threshold
         cond.attrs['prop_pass_thresh'] = .7
-        cond.attrs['run'] = run
+        cond.attrs['run'] = run or condname
         if group: cond.attrs['group'] = group
         cond.create_group('blocks')
         cond.create_group('correlations')
