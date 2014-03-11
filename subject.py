@@ -1,5 +1,4 @@
 import h5py
-        if group: cond.attrs['group'] = group
 import nibabel as nib
 from funcs_correlate import shift, standardize
 from pietools import load_nii_or_npy
