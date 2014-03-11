@@ -18,6 +18,7 @@ conds:
         offset: 10
         max_len: 280
         threshold: 6000
+        #groups: csv file putting participants into groups...
 
     wordscram2:
         base_dir: 'pipeline/subjects'

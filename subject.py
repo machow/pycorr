@@ -191,10 +191,12 @@ class Exp:
         #TODO change to getitem method?
         return self.f['conds/%s'%condname]
 
-    def iter_runs(self, condname):
+    def iter_runs(self, condname, group=None):
         for sname, sub in self.f['subjects'].iteritems():
             for cname, cond in sub.iteritems():
-                if cname == condname: yield Run(cond)
+                run = Run(cond)
+                ingroup = not group or run.attrs.get('group') == group  #TODO print warning if no group set for run?
+                if cname == condname and ingroup: yield run
 
     def N_runs(self, condname):
         return len(list(self.iter_runs(condname)))
