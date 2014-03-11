@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.stats import nanmean
-from funcs_correlate import crosscor, corcomposite
+from funcs_correlate import crosscor, corcomposite, corsubs
 
 def dset_overwrite(g, name, dat):
     """If dset doesn't exist, create it. Then write dat to dset"""
@@ -55,3 +55,13 @@ def isc_between(E, condA, condB, method=('inter-subject', 'subject-total', 'tota
         sub_ttl_mean = nanmean(sub_ttl_corr, axis=0)
 
         dset_overwrite(g_out, 'subject-total', sub_ttl_mean)
+    
+    if 'total-total' in method:
+        #BG correlation for composites
+        gB_out = condB[g_name] if g_name in condB else condB.create_group(g_name)
+        ttl_ttl_corr = corsubs(condA['composite'], condB['composite'])
+
+        dset_overwrite(g_out, 'total-total', ttl_ttl_corr)
+        dset_overwrite(gB_out, 'total-total', ttl_ttl_corr)
+
+
