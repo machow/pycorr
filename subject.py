@@ -137,13 +137,15 @@ class Exp:
                 self.create_cond(condname, **cond)
         self.f.flush()
 
-    def create_cond(self, condname, offset=0, max_len=None, threshold=0, audio_env=None, 
+    def create_cond(self, condname, run, group=None, offset=0, max_len=None, threshold=0, audio_env=None, 
                     base_dir="", nii_files=None, dry_run=False, **kwargs):
         cond = self.f['conds'].create_group(condname)
         cond.attrs['offset'] = offset
         cond.attrs['max_len'] = max_len
         cond.attrs['threshold'] = threshold
         cond.attrs['prop_pass_thresh'] = .7
+        cond.attrs['run'] = run
+        if group: cond.attrs['group'] = group
         cond.create_group('blocks')
         cond.create_group('correlations')
         cond.create_group('analyses')
@@ -154,16 +156,20 @@ class Exp:
             aud_path = os.path.join(base_dir, audio_env)
             print aud_path
             cond.create_dataset('audio_env', data=load_nii_or_npy(aud_path))
+        
+        #Don't attempt to load data when nii_files is blank (dummy cond)
+        if not nii_files: return
 
-        full_query = os.path.join(base_dir, nii_files)
         #Create subject data
+        full_query = os.path.join(base_dir, nii_files)
         for m in self.get_subject_files(full_query):
             fname = m.group()
-            sub_id = m.groupdict()['sub_id']
+            sub_id = m.groupdict()['sub_id'] #TODO add run_id to mix
             print fname, sub_id
             if not dry_run: self.create_subrun(sub_id, condname, fname, **cond.attrs)
             #have option to do threshold?
             self.f.flush()
+
         #TODO blocks (pandas)
         if dry_run:
             for k, v in cond.attrs.iteritems(): print k, ':\t\t', v
@@ -192,11 +198,13 @@ class Exp:
         return self.f['conds/%s'%condname]
 
     def iter_runs(self, condname, group=None):
+        cond = self.get_cond(condname) if hasattr(condname, 'upper') else condname #TODO this is hacky
         for sname, sub in self.f['subjects'].iteritems():
-            for cname, cond in sub.iteritems():
-                run = Run(cond)
+            for run_name, raw_run in sub.iteritems():
+                run = Run(raw_run)
+                group = group if group else cond.attrs.get('group')
                 ingroup = not group or run.attrs.get('group') == group  #TODO print warning if no group set for run?
-                if cname == condname and ingroup: yield run
+                if run_name == cond.attrs['run'] and ingroup: yield run
 
     def N_runs(self, condname):
         return len(list(self.iter_runs(condname)))
