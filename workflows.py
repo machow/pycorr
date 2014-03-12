@@ -59,7 +59,7 @@ def isc_between(E, condA, condB, method=('inter-subject', 'subject-total', 'tota
     if 'total-total' in method:
         #BG correlation for composites
         gB_out = condB[g_name] if g_name in condB else condB.create_group(g_name)
-        ttl_ttl_corr = corsubs(condA['composite'], condB['composite'])
+        ttl_ttl_corr = corsubs(condA['composite'][...], condB['composite'][...])
 
         dset_overwrite(g_out, 'total-total', ttl_ttl_corr)
         dset_overwrite(gB_out, 'total-total', ttl_ttl_corr)
