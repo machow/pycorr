@@ -1,6 +1,12 @@
 pycorr
 ======
 
+Running Full Example 
+--------------------
+
+Create a new directory. Then, from this directory run `python setup.py test`.
+This will copy the necessary data and scripts, including `run.py`. Enter 
+`python run.py` to setup the hdf5 datastore and analyses.
 
 TODO
 ----
