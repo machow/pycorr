@@ -1,7 +1,6 @@
 import numpy as np
 from funcs_correlate import corcomposite, sum_tc, intersubcorr
 from scipy.stats import nanmean
-from tests.gen_corrmat import corr_eig
 
 def isc_within_diff(A, B, standardized=False):
     isc = lambda L, ttl: nanmean([corcomposite(dat, ttl, standardized=standardized) for dat in L],
@@ -34,7 +33,7 @@ def perm_test(A, B, fun, nreps = 1, out = None,  **kwargs):
     AB = A + B
     for ii in range(nreps):
         np.random.shuffle(AB)
-        out[ii] = fun(AB[:len(A)], AB[len(A):])
+        out[ii] = fun(AB[:len(A)], AB[len(A):], **kwargs)
 
     return out
 
