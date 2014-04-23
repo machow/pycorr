@@ -40,18 +40,18 @@ out = []
 sol = []
 for lam in corrs:
     C, data = corr_eig(lam, nsubs, npoints)
-    print np.corrcoef(data.T)
+    #print np.corrcoef(data.T)
     sol.append(C)
     out.append(data)
 data
 
-from funcs_correlate import crosscor
+from pieman.funcs_correlate import crosscor
 np.array(sol)
 out = np.array(out).transpose([2,0,1])
 out_sol = crosscor(out, standardized=False)
 np.allclose(out_sol, np.array(sol))
 
-for ii, sub in enumerate(out): print ii
+#for ii, sub in enumerate(out): print ii
 
 fourD = out[[(0,1,2)*2*2]].reshape([3,2,2,15,10])
 # subject dim x (indx 1 is below thresh) x (indx 1 has two nan subs) x (time)
