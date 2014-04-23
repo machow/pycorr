@@ -1,6 +1,7 @@
 import numpy as np
-from funcs_correlate import corcomposite, sum_tc
+from funcs_correlate import corcomposite, sum_tc, intersubcorr
 from scipy.stats import nanmean
+from tests.gen_corrmat import corr_eig
 
 def isc_within_diff(A, B, standardized=False):
     isc = lambda L, ttl: nanmean([corcomposite(dat, ttl, standardized=standardized) for dat in L],
@@ -10,6 +11,11 @@ def isc_within_diff(A, B, standardized=False):
     A_mean_isc = isc(A, A_composite)
     B_mean_isc = isc(B, B_composite)
     return A_mean_isc - B_mean_isc
+
+def isc_corrmat_within_diff(indxA, indxB, C):
+    C_A = C[indxA][:,indxA]
+    C_B = C[indxB][:,indxB]
+    return nanmean(intersubcorr(C_A), axis=-1) - nanmean(intersubcorr(C_B), axis=-1)
 
 def perm_test(A, B, fun, nreps = 1, out = None,  **kwargs):
     """Permutation test. Randomly shuffles group labels, then runs fun. Group
@@ -31,3 +37,5 @@ def perm_test(A, B, fun, nreps = 1, out = None,  **kwargs):
         out[ii] = fun(AB[:len(A)], AB[len(A):])
 
     return out
+
+
