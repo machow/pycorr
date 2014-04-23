@@ -43,9 +43,9 @@ def corsubs(A, B, axis = -1, standardized = False):
         std    = lambda M: M.std(axis, ddof=1)
         return np.sum(demean(A) * demean(B), axis) / (std(A)*std(B) * n_df)
 
-def corcomposite(sub, dsummed):
+def corcomposite(sub, dsummed, **kwargs):
     """Convenience function for correlating subject with a composite it is part of"""
-    return corsubs(sub, dsummed-sub)
+    return corsubs(sub, dsummed-sub, **kwargs)
 
 def sum_tc(dlist, nans = True, standardize_subs=False, standardize_out=False, shape=None):
     """Returns new timecourse from sum of all timecourses.""" 
