@@ -43,11 +43,15 @@ class Run:
             return shifted
 
     def threshold(self, threshold, data=None, save=False):
-        """Boolean mask of values below threshold.
-        
-        May fail if data contains nans
+        """Boolean mask of values below threshold or that are nan.
+
+        Parameters:
+        threshold -- value that mean timecourse must exceed
+        data      -- if given, threshold this data set. Otherwise, load run data.
+        save      -- save threshold to dataset "threshold" in addition to returning
+
         """
-        data = data if np.any(data) else self.load()
+        data = data if not data is None else self.load()
         thresh_mask = ~(data.mean(axis=-1) > threshold)    #thresh anything not over threshold (including nan)
         
         if save:
