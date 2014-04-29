@@ -16,7 +16,7 @@ def isc_corrmat_within_diff(indxA, indxB, C):
     C_B = C[indxB][:,indxB]
     return nanmean(intersubcorr(C_A), axis=-1) - nanmean(intersubcorr(C_B), axis=-1)
 
-def perm_test(A, B, fun, nreps = 1, out = None,  **kwargs):
+def perm(A, B, fun, nreps = 1, out = None,  **kwargs):
     """Permutation test. Randomly shuffles group labels, then runs fun. Group
     sizes are preserved.
 
