@@ -224,17 +224,20 @@ class Exp:
 
     def gen_cond_thresh(self, condname, overwrite=False):
         cond = self.get_cond(condname)
-
         dlist = [~run.thresh[...] for run in self.iter_runs(condname)]              #all that pass threshold
-        mustpassprop = cond.attrs['prop_pass_thresh']
-        n_must_pass = (mustpassprop) * len(dlist)
-        above_thresh = np.sum(dlist, axis=0)
-        thresh_fail = above_thresh < n_must_pass 			#sum num of failed subjects per voxel
+        thresh_fail = self.cond_thresh(dlist, cond['prop_pass_thresh'])
 
         if 'threshold' not in cond:
             cond.create_dataset('threshold', data=thresh_fail, dtype=bool)
         else: 
             cond['threshold'][...] = thresh_fail
+
+    @staticmethod
+    def cond_thresh(dlist, mustpassprop):
+        n_must_pass = (mustpassprop) * len(dlist)
+        above_thresh = np.sum(dlist, axis=0)
+        thresh_fail = above_thresh < n_must_pass 			#sum num of failed subjects per voxel
+        return thresh_fail
 
     def summarize(self, condname):
         cond = self.get_cond(condname)
