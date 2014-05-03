@@ -66,6 +66,13 @@ def subs_getfile(dirname, matchme, verbose = False):
         matches[sub] = searchr(path.join(dirname, sub), matchme, verbose)
     return matches
 
+def splice_dir(dirname, save=False):
+    data = np.vstack([np.load(os.path.join(dirname, fname)) for fname in os.listdir(dirname)])
+    if save: np.save(dirname + '.npy', data)
+    return data
+
+
+######################
 
 def searchr(dirname, matchme, verbose = True):
     """Walk dir, return list of all matches.  Use glob to match."""
