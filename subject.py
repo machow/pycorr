@@ -62,8 +62,8 @@ class Run:
         self.grp.file.flush()
         return thresh_mask
 
-    def create_dataset(self, data, overwrite=False, ref=False, compression='gzip', chunks=(10,10,10), **kwargs):
-        """Data can be np.ndarray, nifti, or file name"""
+    def create_dataset(self, data, overwrite=False, ref=False, compression='gzip', chunks=(1,), **kwargs):
+        """Data can be np.ndarray, nifti, or file name. Remaining dimensions for chunks are inferred from data"""
         #TODO should fill attributes be mandatory?
         #TODO ref and overwrite args
         if self.data and not overwrite:
@@ -73,7 +73,7 @@ class Run:
         elif type(data) is nib.nifti1.Nifti1Image: np_arr = data.get_data() #nifti
         else: np_arr = data                                                 #np array
         #rdy_arr = np_arr.reshape([-1, np_arr.shape[-1]])
-        chunks += np_arr.shape[-1:]
+        chunks += np_arr.shape[len(chunks):]             #fill in rest of chunk information
         self.data = self.grp.create_dataset('data', data=np_arr, chunks=chunks, compression=compression)
         if kwargs: self.fill_attributes(**kwargs)
         self.grp.file.flush()
@@ -202,6 +202,12 @@ class Exp:
         return self.f['conds/%s'%condname]
 
     def iter_runs(self, condname, group=None):
+        """Iterate through all subjects and all runs within subject. Yield run with same name as run attr in cond
+        
+        Parameters:
+        condname --  string specifying condition or condition object
+        group    --  group name that must also match in the group attr for each run
+        """
         cond = self.get_cond(condname) if hasattr(condname, 'upper') else condname #TODO this is hacky
         for sname, sub in self.f['subjects'].iteritems():
             for run_name, raw_run in sub.iteritems():
