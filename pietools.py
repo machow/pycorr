@@ -71,6 +71,41 @@ def splice_dir(dirname, save=False):
     if save: np.save(dirname + '.npy', data)
     return data
 
+import errno
+
+def mkdir_p(path):
+        try:
+            os.makedirs(path)
+        except OSError as exc: # Python >2.5
+            if exc.errno == errno.EEXIST and os.path.isdir(path):
+                pass
+            else: raise
+
+# Script functions ------------------------------------------------------------
+def parse_section(snapshot):
+    if snapshot == 'all':
+        return slice(None)
+    try:
+        section = int(snapshot)
+    except ValueError:
+        section = [int(s) if s else None for s in snapshot.split(':')]
+        if len(section) > 3:
+            raise ValueError('snapshots input incorrect')
+        section = slice(*section)
+    return section
+
+import gc
+def arr_slice(nii_file, _slice):
+    "slices indx from first dim from matrix, for parallelization"
+    print 'loading data'
+    if type(nii_file) is str:
+        nii = nib.load(nii_file)
+        dat = nii.get_data()
+    else: dat = nii_file
+    out = dat[_slice].copy()
+    del dat, nii                   #garbage collection
+    gc.collect()
+    return out
 
 ######################
 
