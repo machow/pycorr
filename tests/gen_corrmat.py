@@ -46,7 +46,6 @@ for lam in corrs:
 data
 
 from pieman.funcs_correlate import crosscor
-np.array(sol)
 out = np.array(out).transpose([2,0,1])
 out_sol = crosscor(out, standardized=False)
 np.allclose(out_sol, np.array(sol))
@@ -54,6 +53,7 @@ np.allclose(out_sol, np.array(sol))
 #for ii, sub in enumerate(out): print ii
 
 fourD = out[[(0,1,2)*2*2]].reshape([3,2,2,15,10])
+fourD_sol = np.concatenate([sol]*4).reshape([2,2,15,3,3])
 # subject dim x (indx 1 is below thresh) x (indx 1 has two nan subs) x (time)
 out_match = fourD + 7000
 out_nan = fourD.copy()            #nan for two subjects
