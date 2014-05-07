@@ -101,9 +101,10 @@ def arr_slice(nii_file, _slice):
     if type(nii_file) is str:
         nii = nib.load(nii_file)
         dat = nii.get_data()
+        del nii
     else: dat = nii_file
     out = dat[_slice].copy()
-    del dat, nii                   #garbage collection
+    del dat                   #garbage collection
     gc.collect()
     return out
 
