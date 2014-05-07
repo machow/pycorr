@@ -12,7 +12,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'test':
     
     import numpy as np
     sys.path.append(os.path.join(basedir, '..'))
-    from pieman.tests.gen_corrmat import fourD, out_sol
+    from pieman.tests.gen_corrmat import fourD, fourD_sol
     for ii, sub in enumerate(fourD):
-        np.save('pipeline/subjects/test_sub%s.npy'%ii, sub)
-    np.save('pipeline/subjects/test_sol.npy', out_sol)
+        np.save('pipeline/subjects/test_sub%s.npy'%ii, sub + 7000)
+    np.save('pipeline/subjects/test_sol.npy', fourD_sol)

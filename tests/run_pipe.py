@@ -35,7 +35,7 @@ for condname in config['conds']:
         run.attrs['offset'] = offset
 
     # With offsets down, can generate composite
-    E.gen_composite(condname)
+    if condname != "dummy":E.gen_composite(condname)
 
 # ISC Calculations ----------------------------------------
 

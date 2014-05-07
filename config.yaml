@@ -45,3 +45,15 @@ conds:
         offset: 10
         max_len: 280
         threshold: 6000
+
+    test_cond:
+        base_dir: 'pipeline/subjects'
+        nii_files: 'test_sub{sub_id}.npy'
+        audio_env:
+        prop_pass_thresh: .7
+        notes: "test data"
+        run: 'test_cond'
+
+        offset: 0
+        max_len: 10
+        threshold: 6000
