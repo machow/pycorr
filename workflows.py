@@ -18,8 +18,8 @@ def isc_within(E, condA, method=('inter-subject', 'subject-total'), threshold=Tr
     if 'inter-subject' in method:
         #wg isc
         C = crosscor(dlist, standardized=True)
-        C = C - np.diag([np.nan]*C.shape[-1])           #not done in place, just in case
-        C_mean = np.squeeze(np.apply_over_axes(nanmean, C, [-1,-2]))
+        C_tmp = C - np.diag([np.nan]*C.shape[-1])           #not done in place, just in case
+        C_mean = np.squeeze(np.apply_over_axes(nanmean, C_tmp, [-1,-2]))
 
         dset_overwrite(g_out, 'isc_mat', C)
         dset_overwrite(g_out, 'inter-subject', C_mean)
