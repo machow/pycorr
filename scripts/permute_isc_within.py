@@ -8,15 +8,19 @@ from pieman.subject import Run, Exp
 from pieman.pietools import mkdir_p, parse_section, arr_slice
 
 # ARG PARSING
-parser = argparse.ArgumentParser()
+desc = """
+Permutation test for within-group ISC differences.
+e.g. permute_isc_within.py -t -x 'all' -o test_out
+"""
+parser = argparse.ArgumentParser(description=desc)
 parser.add_argument('-t', help='run test', action='store_true')
 parser.add_argument('-a', nargs='*', help='niftis in first group')
 parser.add_argument('-b', nargs='*', help='niftis in second group')
-parser.add_argument('-x', type=str, help='slice along row of input arrays to analyze. Can be "all" or slice notation (e.g. ::2)')  
+parser.add_argument('-x', type=str, default='all', help='slice along row of input arrays to analyze. Can be "all" or slice notation (e.g. ::2)')  
 parser.add_argument('-o', '--out', type=str, help='output folder')
 parser.add_argument('--thresh', default=6000, help='threshold activation below this level')
 parser.add_argument('--n_pass', default=.7, help='number of participants above threshold')
-parser.add_argument('--n_reps', default=1000, help='number of permutations to apply')
+parser.add_argument('--n_reps', type=int, default=1000, help='number of permutations to apply')
 args = parser.parse_args()
 print args
 
