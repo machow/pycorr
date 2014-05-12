@@ -231,7 +231,7 @@ class Exp:
     def gen_cond_thresh(self, condname, overwrite=False):
         cond = self.get_cond(condname)
         dlist = [~run.thresh[...] for run in self.iter_runs(condname)]              #all that pass threshold
-        thresh_fail = self.cond_thresh(dlist, cond['prop_pass_thresh'])
+        thresh_fail = self.cond_thresh(dlist, cond.attrs['prop_pass_thresh'])
 
         if 'threshold' not in cond:
             cond.create_dataset('threshold', data=thresh_fail, dtype=bool)
