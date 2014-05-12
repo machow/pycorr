@@ -1,8 +1,7 @@
 """
 Permutation test for within-group ISC differences.
 
-examples
-    permute_isc_within.py -t -x 'all' -o test_out
+E.G. permute_isc_within.py -t -x 'all' -o test_out
 """
 
 import os, sys, argparse
