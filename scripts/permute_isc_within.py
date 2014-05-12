@@ -1,3 +1,10 @@
+"""
+Permutation test for within-group ISC differences.
+
+examples
+    permute_isc_within.py -t -x 'all' -o test_out
+"""
+
 import os, sys, argparse
 basedir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(basedir + '/../..'))
@@ -8,11 +15,7 @@ from pieman.subject import Run, Exp
 from pieman.pietools import mkdir_p, parse_section, arr_slice
 
 # ARG PARSING
-desc = """
-Permutation test for within-group ISC differences.
-e.g. permute_isc_within.py -t -x 'all' -o test_out
-"""
-parser = argparse.ArgumentParser(description=desc)
+parser = argparse.ArgumentParser(description= __doc__)
 parser.add_argument('-t', help='run test', action='store_true')
 parser.add_argument('-a', nargs='*', help='niftis in first group')
 parser.add_argument('-b', nargs='*', help='niftis in second group')
