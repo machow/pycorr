@@ -60,5 +60,5 @@ out_nan = fourD.copy()            #nan for two subjects
 out_nan[0:2,...] = np.nan
 out_thresh = fourD.copy()         #below thresh
 
-np.allclose(crosscor(out_match), out_sol)
-np.allclose(crosscor(fourD, standardized=False), out_sol)
+#np.allclose(crosscor(out_match), out_sol)
+#np.allclose(crosscor(fourD, standardized=False), out_sol)

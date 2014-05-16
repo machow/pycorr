@@ -103,7 +103,7 @@ def arr_slice(nii_file, _slice):
         dat = nii.get_data()
         del nii
     else: dat = nii_file
-    out = dat[_slice].copy()
+    out = dat[_slice, np.newaxis].copy()
     del dat                   #garbage collection
     gc.collect()
     return out
