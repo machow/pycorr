@@ -3,8 +3,6 @@ import nibabel as nib
 from funcs_correlate import shift, standardize
 from pietools import load_nii_or_npy
 import numpy as np
-from scipy.stats import nanmean
-
 
 class Run:
     """Class to wrap /Subjects/sub_id/Cond"""
@@ -18,31 +16,37 @@ class Run:
         self.thresh  = h5grp['thresh']  if 'thresh' in h5grp else None
         self.attrs = h5grp.attrs
         
-    def load(self, block=None, standardized=False, threshold=False, roi=False, _slice=None):
+    def load(self, subset=slice(None), standardized=False, threshold=False, roi=False, _slice=None):
         """
-        return data as a numpy array. Select from block, otherwise use offset attr to shift.
-        TODO: use slices, change roi so that it properly takes mean along xyz axes (instead of assuming flat)
-        Roi forces standardize
+        Return data as a numpy array. Uses data attributes to shift, and (optionally) threshold.
+        Final ROI timecourses are standardized.
+
+        Parameters:
+        subset       --  boolean mask for subsetting timecourse
+        standardized --  demean and scale timecourse for each voxel
+        threshold    --  set thresholded values to nan
+        roi          --  roi mask to subset spatial dims
+        _slice       --  slice along first dimension to take
+
         """
-        if block: BaseException
-        #ROI (could also set roi equal to ellipsis or have shift return a slice
+        # ROI 
         if np.any(roi):
             if threshold: roi = roi & ~self.thresh[...]
             M_roi = self.data[...][roi]    #Have to load into mem :(
             shifted = shift(M_roi, h=self.data.attrs['offset'], outlen=self.data.attrs['max_len'])   #shift last dim forward h
             if standardized: standardize(shifted, inplace=True)
-            return standardize(shifted.mean(axis=0))           #restandardize, and collapse the vox X ts 2D mat
+            return standardize(shifted.mean(axis=0))[..., subset]           #restandardize, and collapse the vox X ts 2D mat TODO: why is this done?
+
+        # Full 4D array
         else: 
             data = self.data[_slice][np.newaxis,...] if _slice is not None else self.data
             shifted = shift(data, h=self.data.attrs['offset'], outlen=self.data.attrs['max_len'])   #shift last dim forward h
-
-            #other args
             if standardized: standardize(shifted, inplace=True)
             if threshold: 
                 thresh = self.thresh[_slice][np.newaxis,...] if _slice is not None else self.thresh[...]
                 shifted[thresh] = np.nan
         
-            return shifted
+            return shifted[..., subset]
 
     def threshold(self, threshold, data=None, save=False):
         """Boolean mask of values below threshold or that are nan.
