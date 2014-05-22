@@ -94,6 +94,6 @@ if not args.isc_only:
 # Output ----------------------------------------------------------------------
 outtmp = os.path.join(args.out, "{fold}/{ID}.npy")
 for k, v in out.iteritems():
-    outfile = outtmp.format(fold=k, ID=ID)
+    outfile = outtmp.format(fold=k, ID=args.x or ID)
     mkdir_p(os.path.dirname(outfile))
     np.save(outfile, v)
