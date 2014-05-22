@@ -1,5 +1,13 @@
 """
-Permutation test for within-group ISC differences.
+Permutation test for within-group ISC differences. May be used to calculate within-group ISC in parallel.
+
+Outputs:
+    thresh_fail -- participants that fall below threshold
+    isc_corrmat -- full subject-subject correlation matrix.
+    isc_A -- subject-total correlation for group A.
+    null -- distribution from perm test (n_reps x spatial_dims)
+    r -- within_A - within_B
+    p -- proportion of null equal to or more extreme (two-tailed) than r
 
 E.G. permute_isc_within.py -t -x 'all' -o test_out
 """
@@ -16,12 +24,14 @@ from pieman.pietools import mkdir_p, parse_section, arr_slice
 # ARG PARSING
 parser = argparse.ArgumentParser(description= __doc__)
 parser.add_argument('-t', help='run test', action='store_true')
-parser.add_argument('-a', nargs='*', help='niftis in first group')
-parser.add_argument('-b', nargs='*', help='niftis in second group')
-parser.add_argument('-x', type=str, default='all', help='slice along row of input arrays to analyze. Can be "all" or slice notation (e.g. ::2)')  
+parser.add_argument('-a', nargs='*', help='niftis in first group or condname if hdf5')
+parser.add_argument('-b', nargs='*', help='niftis in second group or condname if hdf5')
+parser.add_argument('-x', type=str, help='slice along row of input arrays to analyze. Can be "all" or slice notation (e.g. ::2)')  
 parser.add_argument('-o', '--out', type=str, help='output folder')
-parser.add_argument('--thresh', default=6000, help='threshold activation below this level')
-parser.add_argument('--n_pass', default=.7, help='number of participants above threshold')
+parser.add_argument('--isc_only', action='store_true', help='just calculate intersubject correlation, instead of running perm test')
+parser.add_argument('--hdf5', nargs='?', help='hdf5 pipeline to load niftis from')
+parser.add_argument('--thresh', default=6000, help='threshold activation below this level. (not implemented,  hardcoded)')
+parser.add_argument('--n_pass', default=.7, help='number of participants above threshold. (not implemented, hardcoded)')
 parser.add_argument('--n_reps', type=int, default=1000, help='number of permutations to apply')
 args = parser.parse_args()
 print args
@@ -32,46 +42,58 @@ ID = parse_section(args.x) if args.x is not None else int(os.environ['SGE_TASK_I
 # OUTPUTS
 out = {}
 
-# LOAD FILES
-if args.t:                     #TESTING FLAG 
-    from pieman.tests.gen_corrmat import fourD
-    A_files = fourD + 7000
-    B_files = fourD + 7000
-elif args.a and args.b:    
-    A_files = args.a
-    B_files = args.b
-else: raise BaseException('need either test or specify inputs')
-
 # Load and Slice data ---------------------------------------------------------
-A = [arr_slice(fname, ID) for fname in A_files]
-B = [arr_slice(fname, ID) for fname in B_files]
+if not args.hdf5:
+    # LOAD FILES
+    if args.t:                     #TESTING FLAG 
+        from pieman.tests.gen_corrmat import fourD
+        A_files = fourD + 7000
+        B_files = fourD + 7000
+    elif args.a and args.b:    
+        A_files = [os.path.join(args.a[0], fname) for fname in os.listdir(args.a[0])]  #TODO change back, hack until rondo jobs are fixed
+        B_files = [os.path.join(args.b[0], fname) for fname in os.listdir(args.b[0])]
+    else: raise BaseException('need either test or specify inputs')
 
-# Thresholding ----------------------------------------------------------------
-#Hack to get threshold function, which is a class method TODO def move threshold
-import h5py
-Run = Run(h5py.File('dummy.h5'))
+    A = [arr_slice(fname, ID) for fname in A_files]
+    B = [arr_slice(fname, ID) for fname in B_files]
+    # Thresholding
+    #Hack to get threshold function, which is a class method TODO def move threshold
+    import h5py
+    Run = Run(h5py.File('dummy.h5'))
 
-# threshold tcs with low mean
-for dat in A+B: dat[Run.threshold(6000, dat)] = np.nan      
-thresh_pass = [~np.isnan(dat.sum(axis=-1)) for dat in A+B]
-out['thresh_fail'] = Exp.cond_thresh(thresh_pass, mustpassprop=.7)
+    # threshold tcs with low mean
+    for dat in A+B: dat[Run.threshold(6000, dat)] = np.nan      
+    thresh_pass = [~np.isnan(dat.sum(axis=-1)) for dat in A+B]
+    out['thresh_fail'] = Exp.cond_thresh(thresh_pass, mustpassprop=.7)
+else:
+    E = Exp(args.hdf5)
+    A = [run.load(standardized=True, threshold=True,  _slice=ID) for run in E.iter_runs(args.a[0])]
+    if args.b:  #TODO fix, so hacky.. this script needs structure (want to let arg.b be optional
+        B = [run.load(standardized=True, threshold=True, _slice=ID) for run in E.iter_runs(args.b[0])]
+    else: B = []
+    out['thresh_fail'] = E.get_cond(args.a[0])['threshold'][...]
 
-# Cross-Correlation matrix (we will permute rows and columns)
-out['isc_corrmat'] = crosscor(A+B, standardized=False)
-
-# Combine group indices for correlation matrix (we will shuffle these)
+# Combine group indices for correlation matrix (we will shuffle these) --------
 indx_A = range(len(A))
 indx_B = range(len(A), len(A + B))
 print indx_A
 print indx_B
 
-out['null'] = perm(indx_A, indx_B, isc_corrmat_within_diff, nreps=args.n_reps, C = out['isc_corrmat'])
-out['r'] = isc_corrmat_within_diff(indx_A, indx_B, out['isc_corrmat'])
-out['p'] = np.mean(np.abs(out['r']) <= np.abs(out['null']), axis=-1)
+# Cross-Correlation matrix (we will permute rows and columns) -----------------
+out['isc_corrmat'] = crosscor(A+B, standardized=False)
 out['isc_A'] = intersubcorr(out['isc_corrmat'][..., indx_A, :][..., :, indx_A])
 
+# Permutation Test ------------------------------------------------------------
+if not args.isc_only:
+    out_shape = (args.n_reps, ) +  out['isc_corrmat'].shape[:-2]      #n_reps x spatial_dims
+    out['null'] = perm(indx_A, indx_B, isc_corrmat_within_diff, C = out['isc_corrmat'],
+                       nreps=args.n_reps, out=np.zeros(out_shape))
+    out['r'] = isc_corrmat_within_diff(indx_A, indx_B, out['isc_corrmat'])
+    out['p'] = np.mean(np.abs(out['r']) <= np.abs(out['null']), axis=0)
+
+# Output ----------------------------------------------------------------------
 outtmp = os.path.join(args.out, "{fold}/{ID}.npy")
 for k, v in out.iteritems():
-    outfile = outtmp.format(fold=k, ID=args.x or os.environ['SGE_TASK_ID'])
+    outfile = outtmp.format(fold=k, ID=ID)
     mkdir_p(os.path.dirname(outfile))
     np.save(outfile, v)
