@@ -16,7 +16,7 @@ class Run:
         self.thresh  = h5grp['thresh']  if 'thresh' in h5grp else None
         self.attrs = h5grp.attrs
         
-    def load(self, subset=slice(None), standardized=False, threshold=False, roi=False, _slice=None):
+    def load(self, subset=None, standardized=False, threshold=False, roi=False, _slice=None):
         """
         Return data as a numpy array. Uses data attributes to shift, and (optionally) threshold.
         Final ROI timecourses are standardized.
@@ -29,6 +29,7 @@ class Run:
         _slice       --  slice along first dimension to take
 
         """
+        if subset is None: subset = slice(None)      #to preserve array shapes when subsetting
         # ROI 
         if np.any(roi):
             if threshold: roi = roi & ~self.thresh[...]
