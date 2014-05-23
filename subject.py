@@ -1,7 +1,7 @@
 import h5py
 import nibabel as nib
 from funcs_correlate import shift, standardize
-from pietools import load_nii_or_npy
+from pietools import load_nii_or_npy, is_numeric
 import numpy as np
 
 class AttrArray(np.ndarray):
@@ -35,7 +35,7 @@ class Run:
         else:
             return self.grp['data']                         # data from hdf5
         
-    def load(self, subset=None, standardized=False, threshold=False, roi=False, _slice=None):
+    def load(self, use_subset=True, standardized=False, threshold=False, roi=False, _slice=None):
         """
         Return data as a numpy array. Uses data attributes to shift, and (optionally) threshold.
         Final ROI timecourses are standardized.
@@ -48,7 +48,13 @@ class Run:
         _slice       --  slice along first dimension to take
 
         """
-        if subset is None: subset = slice(None)      #to preserve array shapes when subsetting
+        # Subset loading
+        sub_path = self.data.attrs['subset']
+        if is_numeric(use_subset) and type(use_subset) != bool: subset = use_subset
+        elif use_subset and sub_path: subset = sub_path
+        else: subset = slice(None)           #to preserve array shapes when subsetting
+        print subset
+
         # ROI 
         if np.any(roi):
             if threshold: roi = roi & ~self.thresh[...]
@@ -111,7 +117,7 @@ class Run:
         self.grp.file.flush()
         #self.data.attrs['shape'] = np_arr.shape
 
-    def fill_attributes(self, offset=0, max_len=None, exclude=False, notes="", reference=False, **kwargs): #TODO should initial arguments be set from Exp setup, so they can be in the yaml?
+    def fill_attributes(self, offset=0, max_len=None, exclude=False, notes="", reference=False, subset=False, **kwargs): #TODO should initial arguments be set from Exp setup, so they can be in the yaml?
         """Kwargs are unused (there to soak up uneccesary args)"""
         if not self.data: raise BaseException('data does not exist')
         if not max_len: max_len = self.data.shape[-1]
@@ -120,6 +126,7 @@ class Run:
         self.data.attrs['exclude'] = exclude
         self.data.attrs['notes'] = notes
         self.data.attrs['reference'] = reference
+        self.data.attrs['subset'] = subset
         #'blocks': pandas,
         #nii_hdr,
         #'date_scanned': unix date?

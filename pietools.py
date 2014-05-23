@@ -9,6 +9,11 @@ import re
 import nibabel as nib
 import numpy as np
 
+def is_numeric(obj):
+    """Checks for numeric-like objects."""
+    attrs = ['__add__', '__sub__', '__mul__', '__div__', '__pow__']
+    return all(hasattr(obj, attr) for attr in attrs)
+
 def load_nii_or_npy(fname):
     """convenience function to load nib or np filetypes"""
     if os.path.splitext(fname)[1] == '.npy': return np.load(fname)

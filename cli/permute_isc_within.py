@@ -69,7 +69,7 @@ if not args.hdf5:
     out['thresh_fail'] = Exp.cond_thresh(thresh_pass, mustpassprop=.7)
 else:
     E = Exp(args.hdf5)
-    A = [run.load(subset=mask, standardized=True, threshold=True,  _slice=ID) for run in E.iter_runs(args.a[0])]
+    A = [run.load(use_subset=mask, standardized=True, threshold=True,  _slice=ID) for run in E.iter_runs(args.a[0])]
     if args.b:  #TODO fix, so hacky.. this script needs structure (want to let arg.b be optional
         B = [run.load(standardized=True, threshold=True, _slice=ID) for run in E.iter_runs(args.b[0])]
     else: B = []
