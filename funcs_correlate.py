@@ -39,7 +39,7 @@ def corsubs(A, B, axis = -1, standardized = False):
     n_df = A.shape[axis] - 1
     if standardized: return np.sum(A * B, axis) / n_df
     else:
-        demean = lambda M: M - np.mean(M, axis = axis, keepdims=True)
+        demean = lambda M: M - M.mean(axis = axis, keepdims=True)
         std    = lambda M: M.std(axis, ddof=1)
         return np.sum(demean(A) * demean(B), axis) / (std(A)*std(B) * n_df)
 

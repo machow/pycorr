@@ -4,6 +4,15 @@ from funcs_correlate import shift, standardize
 from pietools import load_nii_or_npy
 import numpy as np
 
+class AttrArray(np.ndarray):
+    """Subclass of ndarray. Provides attributes property to match hdf5 dset.
+    
+    This is used when data are not loaded into hdf5, but externally"""
+    def __new__(self, np_arr, attrs):
+        obj = np_arr.view(self)
+        obj.attrs = attrs
+        return obj
+
 class Run:
     """Class to wrap /Subjects/sub_id/Cond"""
 
@@ -12,9 +21,19 @@ class Run:
 
         """
         self.grp = h5grp
-        self.data    = h5grp['data']    if 'data'   in h5grp else None
+        #self.data    = h5grp['data']    if 'data'   in h5grp else None
         self.thresh  = h5grp['thresh']  if 'thresh' in h5grp else None
         self.attrs = h5grp.attrs
+
+    @property
+    def data(self):
+        if not self.grp.get('data'): return None            # no data exists
+        attrs = self.grp['data'].attrs
+        if attrs.get('reference'):
+            d =  load_nii_or_npy(attrs['reference'])
+            return AttrArray(d, attrs)                      # data from external npy or nifti
+        else:
+            return self.grp['data']                         # data from hdf5
         
     def load(self, subset=None, standardized=False, threshold=False, roi=False, _slice=None):
         """
@@ -69,24 +88,30 @@ class Run:
         self.grp.file.flush()
         return thresh_mask
 
-    def create_dataset(self, data, overwrite=False, ref=False, compression='gzip', chunks=(1,), **kwargs):
-        """Data can be np.ndarray, nifti, or file name. Remaining dimensions for chunks are inferred from data"""
+    def create_dataset(self, data, overwrite=False, reference=False, compression='gzip', chunks=(1,), **kwargs):
+        """Data can be np.ndarray, nifti, or file name. Remaining dimensions for chunks are inferred from data
+        
+        Even if ref is True, still loads data (to ensure it exists)
+        """
         #TODO should fill attributes be mandatory?
         #TODO ref and overwrite args
         if self.data and not overwrite:
             raise BaseException('data already exists')
-
         if type(data) is str: np_arr = load_nii_or_npy(data)                #string
         elif type(data) is nib.nifti1.Nifti1Image: np_arr = data.get_data() #nifti
         else: np_arr = data                                                 #np array
         #rdy_arr = np_arr.reshape([-1, np_arr.shape[-1]])
         chunks += np_arr.shape[len(chunks):]             #fill in rest of chunk information
-        self.data = self.grp.create_dataset('data', data=np_arr, chunks=chunks, compression=compression)
-        if kwargs: self.fill_attributes(**kwargs)
+        if reference:
+           self.grp.create_group('data')                 #make dummy group for attrs 
+           reference = data                              # file path
+        else:
+            self.grp.create_dataset('data', data=np_arr, chunks=chunks, compression=compression)
+        if kwargs: self.fill_attributes(reference=reference, **kwargs)
         self.grp.file.flush()
         #self.data.attrs['shape'] = np_arr.shape
 
-    def fill_attributes(self, offset=0, max_len=None, exclude=False, notes="", **kwargs): #TODO should initial arguments be set from Exp setup, so they can be in the yaml?
+    def fill_attributes(self, offset=0, max_len=None, exclude=False, notes="", reference=False, **kwargs): #TODO should initial arguments be set from Exp setup, so they can be in the yaml?
         """Kwargs are unused (there to soak up uneccesary args)"""
         if not self.data: raise BaseException('data does not exist')
         if not max_len: max_len = self.data.shape[-1]
@@ -94,6 +119,7 @@ class Run:
         self.data.attrs['max_len'] = max_len
         self.data.attrs['exclude'] = exclude
         self.data.attrs['notes'] = notes
+        self.data.attrs['reference'] = reference
         #'blocks': pandas,
         #nii_hdr,
         #'date_scanned': unix date?
@@ -149,13 +175,14 @@ class Exp:
         self.f.flush()
 
     def create_cond(self, condname, run=None, group=None, offset=0, max_len=None, threshold=0, audio_env=None, 
-                    base_dir="", nii_files=None, dry_run=False, **kwargs):
+                    base_dir="", nii_files=None, dry_run=False, reference=False, **kwargs):
         cond = self.f['conds'].create_group(condname)
         cond.attrs['offset'] = offset
         cond.attrs['max_len'] = max_len
         cond.attrs['threshold'] = threshold
         cond.attrs['prop_pass_thresh'] = .7
         cond.attrs['run'] = run or condname
+        cond.attrs['reference'] = reference
         if group: cond.attrs['group'] = group
         cond.create_group('blocks')
         cond.create_group('correlations')
@@ -187,7 +214,7 @@ class Exp:
             del self.f[cond.name]
         return cond
     
-    def create_subrun(self, sub_id, condname, fname_or_arr, ref=False, **kwargs):
+    def create_subrun(self, sub_id, condname, fname_or_arr, reference=False, **kwargs):
         path = '%s/%s'%(sub_id, condname)
         #Remote link if sub_folder is specified
         if self.f.attrs['sub_folder'] and not sub_id in self.f['subjects']:
@@ -199,8 +226,7 @@ class Exp:
         #add condition to subject group
         g_sub = self.f['subjects'].create_group('%s/%s'%(sub_id, condname))
         run = Run(g_sub)
-        run.create_dataset(data=fname_or_arr, ref=False)
-        run.fill_attributes(**kwargs)
+        run.create_dataset(data=fname_or_arr, reference=reference, **kwargs)
 
         return run
 
@@ -220,7 +246,7 @@ class Exp:
             for run_name, raw_run in sub.iteritems():
                 run = Run(raw_run)
                 group = group if group else cond.attrs.get('group')
-                ingroup = not group or run.attrs.get('group') == group  #TODO print warning if no group set for run?
+                ingroup = not group or run.attrs.get('group') == group  #TODO print warning if no group set for run? need to set group in Run class
                 if run_name == cond.attrs['run'] and ingroup: yield run
 
     def N_runs(self, condname):
