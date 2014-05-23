@@ -28,6 +28,7 @@ parser.add_argument('-a', nargs='*', help='niftis in first group or condname if 
 parser.add_argument('-b', nargs='*', help='niftis in second group or condname if hdf5')
 parser.add_argument('-x', type=str, help='slice along row of input arrays to analyze. Can be "all" or slice notation (e.g. ::2)')  
 parser.add_argument('-o', '--out', type=str, help='output folder')
+parser.add_argument('-m', '--mask', type=str, help='boolean timecourse mask for subsetting')
 parser.add_argument('--isc_only', action='store_true', help='just calculate intersubject correlation, instead of running perm test')
 parser.add_argument('--hdf5', nargs='?', help='hdf5 pipeline to load niftis from')
 parser.add_argument('--thresh', default=6000, help='threshold activation below this level. (not implemented,  hardcoded)')
@@ -43,6 +44,7 @@ ID = parse_section(args.x) if args.x is not None else int(os.environ['SGE_TASK_I
 out = {}
 
 # Load and Slice data ---------------------------------------------------------
+mask = np.load(args.mask) if args.mask else slice(None)
 if not args.hdf5:
     # LOAD FILES
     if args.t:                     #TESTING FLAG 
@@ -54,8 +56,8 @@ if not args.hdf5:
         B_files = [os.path.join(args.b[0], fname) for fname in os.listdir(args.b[0])]
     else: raise BaseException('need either test or specify inputs')
 
-    A = [arr_slice(fname, ID) for fname in A_files]
-    B = [arr_slice(fname, ID) for fname in B_files]
+    A = [arr_slice(fname, ID)[...,mask] for fname in A_files]
+    B = [arr_slice(fname, ID)[...,mask] for fname in B_files]
     # Thresholding
     #Hack to get threshold function, which is a class method TODO def move threshold
     import h5py
@@ -67,10 +69,11 @@ if not args.hdf5:
     out['thresh_fail'] = Exp.cond_thresh(thresh_pass, mustpassprop=.7)
 else:
     E = Exp(args.hdf5)
-    A = [run.load(standardized=True, threshold=True,  _slice=ID) for run in E.iter_runs(args.a[0])]
+    A = [run.load(subset=mask, standardized=True, threshold=True,  _slice=ID) for run in E.iter_runs(args.a[0])]
     if args.b:  #TODO fix, so hacky.. this script needs structure (want to let arg.b be optional
         B = [run.load(standardized=True, threshold=True, _slice=ID) for run in E.iter_runs(args.b[0])]
     else: B = []
+    E.get_cond(args.a[0])
     out['thresh_fail'] = E.get_cond(args.a[0])['threshold'][...]
 
 # Combine group indices for correlation matrix (we will shuffle these) --------
