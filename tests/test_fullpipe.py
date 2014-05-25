@@ -99,3 +99,8 @@ class test_fullpipe_reference(test_fullpipe): pass
 newcnfg = deepcopy(test_fullpipe_reference.config)
 newcnfg['conds']['test_cond']['reference'] = True
 test_fullpipe_reference.config = newcnfg
+
+class test_fullpipe_nomaxlen(test_fullpipe): pass
+newcnfg = deepcopy(test_fullpipe.config)
+newcnfg['conds']['test_cond']['max_len'] = None
+test_fullpipe_reference.config = newcnfg

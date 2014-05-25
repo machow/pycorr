@@ -181,11 +181,11 @@ class Exp:
                 self.create_cond(condname, **cond)
         self.f.flush()
 
-    def create_cond(self, condname, run=None, group=None, offset=0, max_len=None, threshold=0, audio_env=None, 
+    def create_cond(self, condname, run=None, group=None, offset=0, max_len=False, threshold=0, audio_env=None, 
                     base_dir="", nii_files=None, dry_run=False, reference=False, **kwargs):
         cond = self.f['conds'].create_group(condname)
         cond.attrs['offset'] = offset
-        cond.attrs['max_len'] = max_len
+        cond.attrs['max_len'] = max_len or False     #can't store None
         cond.attrs['threshold'] = threshold
         cond.attrs['prop_pass_thresh'] = .7
         cond.attrs['run'] = run or condname
