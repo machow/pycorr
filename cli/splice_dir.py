@@ -12,6 +12,7 @@ parser.add_argument('-n', '--nifti', type=str, help='save as nifti, using header
 parser.add_argument('-t', '--thresh', type=str, help='threshold mask')
 parser.add_argument('-c', '--check', action='store_true', help='check for missing volumes in folder')
 parser.add_argument('-a', '--all', action='store_true', help='reconstruct all subdirectories')
+parser.add_argument('-m', '--mat', action='store_true', help='save as .mat (in addition to others)')
 args = parser.parse_args()
 
 if args.all:
@@ -24,7 +25,7 @@ else:
     dirs = args.dirnames
 
 for dirname in dirs:
-    if 'thresh_fail' in dirname: continue
+    if 'thresh_fail' in dirname and args.all: continue
     print dirname
     if args.check:
         vols = [int(fname.split('.')[0]) for fname in os.listdir(dirname)]
@@ -33,6 +34,7 @@ for dirname in dirs:
         continue
 
     M = splice_dir(dirname, save=False)
+    print M.shape
     if args.thresh: 
         thresh = load_nii_or_npy(args.thresh)
         M[thresh] = np.nan
@@ -41,5 +43,10 @@ for dirname in dirs:
 
     if args.nifti:
         nii = copy_nii_hdr(args.nifti, M, save=dirname + ".nii.gz")
+
+    if args.mat:
+        import scipy.io as sio
+        sio.savemat(dirname, {'data': M})
+
 
 

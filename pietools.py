@@ -110,9 +110,10 @@ def arr_slice(nii_file, _slice):
     "slices indx from first dim from matrix, for parallelization"
     print 'loading data'
     if type(nii_file) is str:
-        nii = nib.load(nii_file)
-        dat = nii.get_data()
-        del nii
+        #nii = nib.load(nii_file)
+        #dat = nii.get_data()
+        #del nii
+        dat = load_nii_or_npy(nii_file)
     else: dat = nii_file
     out = dat[_slice, np.newaxis].copy()
     del dat                   #garbage collection

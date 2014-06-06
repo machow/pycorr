@@ -56,8 +56,8 @@ if not args.hdf5:
         B_files = [os.path.join(args.b[0], fname) for fname in os.listdir(args.b[0])]
     else: raise BaseException('need either test or specify inputs')
 
-    A = [arr_slice(fname, ID)[...,mask] for fname in A_files]
-    B = [arr_slice(fname, ID)[...,mask] for fname in B_files]
+    A = [arr_slice(fname, ID)[...,mask].astype('float') for fname in A_files]
+    B = [arr_slice(fname, ID)[...,mask].astype('float') for fname in B_files]
     # Thresholding
     #Hack to get threshold function, which is a class method TODO def move threshold
     import h5py
@@ -88,11 +88,13 @@ out['isc_A'] = intersubcorr(out['isc_corrmat'][..., indx_A, :][..., :, indx_A])
 
 # Permutation Test ------------------------------------------------------------
 if not args.isc_only:
-    out_shape = (args.n_reps, ) +  out['isc_corrmat'].shape[:-2]      #n_reps x spatial_dims
+    out_shape = (args.n_reps, ) + out['isc_corrmat'].shape[:-2]      #n_reps x spatial_dims
+    swap_dims = range(1,len(out_shape)) + [0]                        #list with first and last dims swapped
     out['null'] = perm(indx_A, indx_B, isc_corrmat_within_diff, C = out['isc_corrmat'],
                        nreps=args.n_reps, out=np.zeros(out_shape))
-    out['r'] = isc_corrmat_within_diff(indx_A, indx_B, out['isc_corrmat'])
-    out['p'] = np.mean(np.abs(out['r']) <= np.abs(out['null']), axis=0)
+    out['null'] = out['null'].transpose(swap_dims)                            #put corrs on last dim
+    out['r'] = isc_corrmat_within_diff(indx_A, indx_B, out['isc_corrmat'])[..., np.newaxis] #since 1 corr, add axis for broadcasting
+    out['p'] = np.mean(np.abs(out['r']) <= np.abs(out['null']), axis=-1)
 
 # Output ----------------------------------------------------------------------
 outtmp = os.path.join(args.out, "{fold}/{ID}.npy")
