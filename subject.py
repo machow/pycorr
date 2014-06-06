@@ -71,21 +71,23 @@ class Run:
         # ROI 
         if np.any(roi):
             if threshold: roi = roi & ~self.thresh[...]
-            M_roi = self.data[...][roi]    #Have to load into mem :(
+            M_roi = self.data[...][roi]
             shifted = shift(M_roi, h=self.data.attrs['offset'], outlen=self.data.attrs['max_len'])   #shift last dim forward h
-            if standardized: standardize(shifted, inplace=True)
-            return standardize(shifted.mean(axis=0))[..., subset]           #restandardize, and collapse the vox X ts 2D mat TODO: why is this done?
+            final = shifted[..., subset]
+            if standardized: standardize(final, inplace=True)
+            return standardize(final.mean(axis=0))               #restandardize, and collapse the vox X ts 2D mat TODO: why is this done?
 
         # Full 4D array
         else: 
-            data = self.data[_slice][np.newaxis,...] if _slice is not None else self.data
-            shifted = shift(data, h=self.data.attrs['offset'], outlen=self.data.attrs['max_len'])   #shift last dim forward h
-            if standardized: standardize(shifted, inplace=True)
+            data = self.data[_slice][np.newaxis,...] if _slice is not None else self.data           # sliced (for parallel jobs)
+            shifted = shift(data, h=self.data.attrs['offset'], outlen=self.data.attrs['max_len'])   # shift last dim forward h
+            final = shifted[..., subset]
+            if standardized: standardize(final, inplace=True)
             if threshold: 
                 thresh = self.thresh[_slice][np.newaxis,...] if _slice is not None else self.thresh[...]
-                shifted[thresh] = np.nan
+                final[thresh] = np.nan
         
-            return shifted[..., subset]
+            return final
 
     def threshold(self, threshold, data=None, save=False):
         """Boolean mask of values below threshold or that are nan.
