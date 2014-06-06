@@ -147,7 +147,12 @@ def trim(A, ends=(0, 0), h=None):
 def shift(A, h, outlen=None, offset=0):             #TODO remove offset arg?
     """Shifts entire time series by h"""
     h -= offset
-    if h < 0: raise BaseException('after adjusting for offset, h is negative.  Cannot keep outlen.')
+    if h < 0: 
+        #raise BaseException('after adjusting for offset, h is negative.  Cannot keep outlen.')
+        #pad = np.vstack([np.nan]*(-h))
+        pad = [np.nan] * (-h)
+        A = np.insert(A, 0, pad, axis=-1)
+        h = 0
     return A[..., h : outlen and outlen+h]
 
 

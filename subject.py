@@ -14,7 +14,7 @@ class AttrArray(np.ndarray):
         return obj
 
 class Run:
-    """Class to wrap /Subjects/sub_id/Cond"""
+    """Class to wrap /Subjects/sub_id/Cond group"""
 
     def __init__(self, h5grp):
         """Load individual scan, given Group object.
@@ -34,6 +34,16 @@ class Run:
             return AttrArray(d, attrs)                      # data from external npy or nifti
         else:
             return self.grp['data']                         # data from hdf5
+
+    @property
+    def subset(self):
+        sub = self.data.attrs['subset']
+        if type(sub) is str:              # load from string
+            return np.load(sub)
+        elif hasattr(sub, 'shape'):       # boolean array
+            return sub
+        else:                             # no subset
+            return None
         
     def load(self, use_subset=True, standardized=False, threshold=False, roi=False, _slice=None):
         """
@@ -50,9 +60,12 @@ class Run:
         """
         # Subset loading
         sub_path = self.data.attrs['subset']
-        if is_numeric(use_subset) and type(use_subset) != bool: subset = use_subset
-        elif use_subset and sub_path: subset = sub_path
-        else: subset = slice(None)           #to preserve array shapes when subsetting
+        if is_numeric(use_subset) and type(use_subset) != bool:     # subset given
+            subset = use_subset
+        elif use_subset and np.any(sub_path):                         # else use from run attrs
+            subset = np.load(sub_path) if type(sub_path) is str else sub_path
+        else:
+            subset = slice(None)           #to preserve array shapes when subsetting
         print subset
 
         # ROI 
@@ -132,6 +145,12 @@ class Run:
         #'date_scanned': unix date?
         self.grp.file.flush()
 
+    def copy(self, new_cond):
+        g_sub = self.grp.parent
+        if new_cond in g_sub: Exception("group %s already exists"%new_cond)  #otherwise will create as subgroup
+        g_sub.copy(self.grp.name, new_cond)
+        return Run(g_sub[new_cond])
+        
     def summary(self):
         print 'Data:\t',self.data
         print 'thresh:\t', self.thresh
