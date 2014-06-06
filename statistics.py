@@ -12,8 +12,8 @@ def isc_within_diff(A, B, standardized=False):
     return A_mean_isc - B_mean_isc
 
 def isc_corrmat_within_diff(indxA, indxB, C):
-    C_A = C[..., indxA, :][..., :,indxA]
-    C_B = C[..., indxB, :][..., :,indxB]
+    C_A = C[..., np.vstack(indxA), np.hstack(indxA)]   # last rows and columns using indxA
+    C_B = C[..., np.vstack(indxB), np.hstack(indxB)]
     return nanmean(intersubcorr(C_A), axis=-1) - nanmean(intersubcorr(C_B), axis=-1)
 
 def perm(A, B, fun, nreps = 1, out = None,  **kwargs):
