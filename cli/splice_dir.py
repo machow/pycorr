@@ -33,7 +33,7 @@ for dirname in dirs:
         print 'max volume:\t', max(vols)
         continue
 
-    M = splice_dir(dirname, save=False)
+    M = splice_dir(dirname, save=False, mmap='r')
     print M.shape
     if args.thresh: 
         thresh = load_nii_or_npy(args.thresh)

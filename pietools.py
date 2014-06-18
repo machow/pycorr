@@ -75,10 +75,10 @@ def sort_int_folder(files):
     """Sort a folder with files of form {INT}.ext into ascending, numeric order"""
     files.sort(key = lambda x: int(x.split('.')[0]))
 
-def splice_dir(dirname, save=False):
+def splice_dir(dirname, save=False, mmap=None):
     files = os.listdir(dirname)
     sort_int_folder(files)
-    data = np.vstack([np.load(os.path.join(dirname, fname)) for fname in files])
+    data = np.vstack([np.load(os.path.join(dirname, fname), mmap_mode=mmap) for fname in files])
     if save: np.save(dirname + '.npy', data)
     return data
 
