@@ -1,0 +1,128 @@
+.. AUTO-GENERATED FILE -- DO NOT EDIT!
+
+:mod:`pietools`
+===============
+.. automodule:: pycorr.pietools
+
+.. currentmodule:: pycorr.pietools
+.. autosummary::
+
+   OrderedDict
+   arr_slice
+   copy_nii_hdr
+   glob
+   is_numeric
+   load_nii_or_npy
+   loadwith
+   mkdir_p
+   parse_section
+   print_Blocks
+   print_dicom
+   query_to_re_groups
+   searchr
+   sort_int_folder
+   splice_dir
+   subs_getfile
+   test
+   walk
+
+
+.. currentmodule:: pycorr.pietools
+
+
+:class:`OrderedDict`
+~~~~~~~~~~~~~~~~~~~~
+
+
+.. autoclass:: OrderedDict
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+  .. automethod:: __init__
+
+arr_slice
+~~~~~~~~~
+
+.. autofunction:: arr_slice
+
+copy_nii_hdr
+~~~~~~~~~~~~
+
+.. autofunction:: copy_nii_hdr
+
+glob
+~~~~
+
+.. autofunction:: glob
+
+is_numeric
+~~~~~~~~~~
+
+.. autofunction:: is_numeric
+
+load_nii_or_npy
+~~~~~~~~~~~~~~~
+
+.. autofunction:: load_nii_or_npy
+
+loadwith
+~~~~~~~~
+
+.. autofunction:: loadwith
+
+mkdir_p
+~~~~~~~
+
+.. autofunction:: mkdir_p
+
+parse_section
+~~~~~~~~~~~~~
+
+.. autofunction:: parse_section
+
+print_Blocks
+~~~~~~~~~~~~
+
+.. autofunction:: print_Blocks
+
+print_dicom
+~~~~~~~~~~~
+
+.. autofunction:: print_dicom
+
+query_to_re_groups
+~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: query_to_re_groups
+
+searchr
+~~~~~~~
+
+.. autofunction:: searchr
+
+sort_int_folder
+~~~~~~~~~~~~~~~
+
+.. autofunction:: sort_int_folder
+
+splice_dir
+~~~~~~~~~~
+
+.. autofunction:: splice_dir
+
+subs_getfile
+~~~~~~~~~~~~
+
+.. autofunction:: subs_getfile
+
+test
+~~~~
+
+.. autofunction:: test
+
+walk
+~~~~
+
+.. autofunction:: walk
+
