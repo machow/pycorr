@@ -1,0 +1,419 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pycorr.funcs_correlate &mdash; pycorr 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pycorr 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> pycorr</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#python">Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#installing-dependencies">Installing Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#installing-pycorr-on-rondo">Installing pycorr on Rondo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial.html#example-pipeline">Example Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.html"><tt class="docutils literal"><span class="pre">pycorr</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.cli.html"><tt class="docutils literal"><span class="pre">cli</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.funcs_correlate.html"><tt class="docutils literal"><span class="pre">funcs_correlate</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.gen_corrmat.html"><tt class="docutils literal"><span class="pre">gen_corrmat</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.pietools.html"><tt class="docutils literal"><span class="pre">pietools</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.statistics.html"><tt class="docutils literal"><span class="pre">statistics</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.subject.html"><tt class="docutils literal"><span class="pre">subject</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.workflows.html"><tt class="docutils literal"><span class="pre">workflows</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">pycorr</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>pycorr.funcs_correlate</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for pycorr.funcs_correlate</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Functions for loading, standardizing, and calculating correlations (including lagged)</span>
+
+<span class="sd">   M Chow, Oct 2012</span>
+<span class="sd">   machow@princeton.edu</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="kn">as</span> <span class="nn">nib</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span><span class="p">,</span> <span class="n">product</span>
+<span class="kn">from</span> <span class="nn">scipy.stats.stats</span> <span class="kn">import</span> <span class="n">nanmean</span>
+
+<div class="viewcode-block" id="standardize"><a class="viewcode-back" href="../../api/pycorr.funcs_correlate.html#pycorr.funcs_correlate.standardize">[docs]</a><span class="k">def</span> <span class="nf">standardize</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">demean</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">devar</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subtract mean, divide standard deviation (z-scoring).</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        A       (ndarray) : data to standardize.</span>
+<span class="sd">        axis    (int)     : axis along which to standardize.</span>
+<span class="sd">        demean  (bool)    : make mean equal to zero.</span>
+<span class="sd">        devar   (bool)    : make variance equal to one. </span>
+<span class="sd">        inplace (bool)    : operate in-place (and return reference)</span>
+
+<span class="sd">    Returns: standardized copy or reference of A</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        NaNs should be taken care of prior to using this function,</span>
+<span class="sd">        as they will propogate.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">axis</span><span class="p">),</span>         <span class="n">axis</span><span class="p">)</span>
+    <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inplace</span> <span class="ow">and</span> <span class="s">&#39;f&#39;</span> <span class="ow">in</span> <span class="n">A</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">str</span><span class="p">:</span>                   <span class="c">#make sure A is float</span>
+        <span class="c">#inplace operations</span>
+        <span class="k">if</span> <span class="n">demean</span><span class="p">:</span> <span class="n">A</span> <span class="o">-=</span> <span class="n">m</span>
+        <span class="k">if</span> <span class="n">devar</span><span class="p">:</span>  <span class="n">A</span> <span class="o">/=</span> <span class="n">sd</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c">#copy operations</span>
+        <span class="k">if</span> <span class="n">demean</span><span class="p">:</span> <span class="n">A</span> <span class="o">=</span> <span class="n">A</span> <span class="o">-</span> <span class="n">m</span>
+        <span class="k">if</span> <span class="n">devar</span><span class="p">:</span>  <span class="n">A</span> <span class="o">=</span> <span class="n">A</span> <span class="o">/</span> <span class="n">sd</span>
+    <span class="k">return</span> <span class="n">A</span>
+
+</div>
+<div class="viewcode-block" id="corsubs"><a class="viewcode-back" href="../../api/pycorr.funcs_correlate.html#pycorr.funcs_correlate.corsubs">[docs]</a><span class="k">def</span> <span class="nf">corsubs</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">standardized</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return correlation mat of time series along specified axis.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        A        (ndarray) : array of arbitrary dimension</span>
+<span class="sd">        B        (ndarray) : array with dim(B) == dim(A)</span>
+<span class="sd">        axis         (int) : along which to correlate</span>
+<span class="sd">        standardized (bool): specify if sequences are already demeaned, with variance of one</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Correlation matrix with dim(A), except for the axis used for correlating.</span>
+
+<span class="sd">    TODO: generalize axis argument</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_df</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">standardized</span><span class="p">:</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">A</span> <span class="o">*</span> <span class="n">B</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_df</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">demean</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">M</span><span class="p">:</span> <span class="n">M</span> <span class="o">-</span> <span class="n">M</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="n">axis</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">std</span>    <span class="o">=</span> <span class="k">lambda</span> <span class="n">M</span><span class="p">:</span> <span class="n">M</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">demean</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">*</span> <span class="n">demean</span><span class="p">(</span><span class="n">B</span><span class="p">),</span> <span class="n">axis</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">std</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">*</span><span class="n">std</span><span class="p">(</span><span class="n">B</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_df</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="corcomposite"><a class="viewcode-back" href="../../api/pycorr.funcs_correlate.html#pycorr.funcs_correlate.corcomposite">[docs]</a><span class="k">def</span> <span class="nf">corcomposite</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">dsummed</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;corsubs convenience function for correlating subject with a composite it is part of&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">corsubs</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">dsummed</span><span class="o">-</span><span class="n">sub</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="sum_tc"><a class="viewcode-back" href="../../api/pycorr.funcs_correlate.html#pycorr.funcs_correlate.sum_tc">[docs]</a><span class="k">def</span> <span class="nf">sum_tc</span><span class="p">(</span><span class="n">dlist</span><span class="p">,</span> <span class="n">nans</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">standardize_subs</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">standardize_out</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the sum of all timecourses in dlist.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        dlist      :             list or generator of arrays to sum   </span>
+<span class="sd">        nans (bool):             set NaN to 0 when summing    </span>
+<span class="sd">        standardize_subs (bool): standardize before summing</span>
+<span class="sd">        standardize_out  (bool): standardize output</span>
+<span class="sd">        shape (list):            shape (necessary if using generator)</span>
+<span class="sd"> </span>
+<span class="sd">    TODO: what is the point of the nans option?</span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+    <span class="n">newA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span> <span class="ow">or</span> <span class="n">dlist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">standardize_subs</span><span class="p">:</span> 
+        <span class="n">dlist</span> <span class="o">=</span> <span class="p">(</span><span class="n">standardize</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">dlist</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nans</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">dlist</span><span class="p">:</span> 
+            <span class="n">tmp_entry</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">tmp_entry</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">tmp_entry</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">newA</span> <span class="o">+=</span> <span class="n">tmp_entry</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">dlist</span><span class="p">:</span> <span class="n">newA</span> <span class="o">+=</span> <span class="n">entry</span>
+    <span class="k">if</span> <span class="n">standardize_out</span><span class="p">:</span> <span class="n">standardize</span><span class="p">(</span><span class="n">newA</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newA</span>
+
+</div>
+<div class="viewcode-block" id="intersubcorr"><a class="viewcode-back" href="../../api/pycorr.funcs_correlate.html#pycorr.funcs_correlate.intersubcorr">[docs]</a><span class="k">def</span> <span class="nf">intersubcorr</span><span class="p">(</span><span class="n">C_all</span><span class="p">,</span> <span class="n">excludeself</span> <span class="o">=</span> <span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns an array of intersubj correlations.  Last two dims must be the cov matrix.</span>
+
+<span class="sd">    This function uses that the var( sum of R.V.&#39;s ) is the sum of their cov matrix.  If entire row / col</span>
+<span class="sd">    is NaN, then returns ISC as if that subject was removed (to allow dropping voxels with mean activity &lt; 6000.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        C_all      : ndarray with correlation matrix on last two dims</span>
+<span class="sd">        excludeself: remove participant from ISC calculation</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">covttl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_over_axes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">,</span> <span class="n">C_all</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">C_all</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">covcolsums</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">C_all</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">C_all</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">excludeself</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">covcolsums</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">covttl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">covcolsums</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>        <span class="c">#TODO replace final +1 with +diagonal of last 2 dims (np.diagonal(C_</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">covcolsums</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">covttl</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="crosscor"><a class="viewcode-back" href="../../api/pycorr.funcs_correlate.html#pycorr.funcs_correlate.crosscor">[docs]</a><span class="k">def</span> <span class="nf">crosscor</span><span class="p">(</span><span class="n">dlist</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">standardized</span> <span class="o">=</span> <span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Takes list of subject data, returns matrix of correlation matrices at each voxel.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        dlist: list of arrays to correlate along last dimension (must be equal shape)</span>
+<span class="sd">        B    : optionally calculate the cross-correlation matrix with arrays in B</span>
+<span class="sd">        standardized: whether all data are standardized (speeds calculation)</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dlist</span><span class="p">)</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dlist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="p">[</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">]</span>   <span class="c">#collapsed across time, expanded #subs x #subs</span>
+        <span class="n">C_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>   <span class="c">#just need to loop through upper triangle, then use transpose</span>
+            <span class="n">C_all</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span><span class="p">]</span> <span class="o">=</span> <span class="n">corsubs</span><span class="p">(</span><span class="n">dlist</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span> <span class="n">dlist</span><span class="p">[</span><span class="n">jj</span><span class="p">],</span> <span class="n">standardized</span> <span class="o">=</span> <span class="n">standardized</span><span class="p">)</span>    <span class="c">#diagonal not filled</span>
+
+        <span class="n">C_all</span> <span class="o">+=</span> <span class="n">C_all</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">C_all</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>       <span class="c">#Fill in symmetry and diag</span>
+        <span class="k">return</span> <span class="n">C_all</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c">#Second list is provided, calculate all cross-correlations</span>
+        <span class="c">#can&#39;t use symmetry, so must loop through the cartesian product</span>
+        <span class="n">N_a</span><span class="p">,</span> <span class="n">N_b</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dlist</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dlist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="p">[</span><span class="n">N_a</span><span class="p">,</span> <span class="n">N_b</span><span class="p">]</span>
+        <span class="n">C_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N_a</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_b</span><span class="p">)):</span>
+            <span class="n">C_all</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span><span class="p">]</span> <span class="o">=</span> <span class="n">corsubs</span><span class="p">(</span><span class="n">dlist</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span> <span class="n">B</span><span class="p">[</span><span class="n">jj</span><span class="p">],</span> <span class="n">standardized</span><span class="o">=</span><span class="n">standardized</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">C_all</span>
+
+</div>
+<div class="viewcode-block" id="lagcor"><a class="viewcode-back" href="../../api/pycorr.funcs_correlate.html#pycorr.funcs_correlate.lagcor">[docs]</a><span class="k">def</span> <span class="nf">lagcor</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">standardized</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the corr of A_t+h with B_t.  If dim length differs, cut from end.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    A:            n-dim array with time as final dim</span>
+<span class="sd">    B:            same shape array</span>
+<span class="sd">    axis:         time axis (passed to corsubs)</span>
+<span class="sd">    standardized: already demained, and var == one? (passed to corsubs)</span>
+<span class="sd">    offset:       is offset number of timepoints passed B</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">h</span> <span class="o">-=</span> <span class="n">offset</span>               <span class="c">#time-lock series</span>
+    <span class="k">if</span> <span class="n">h</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>                 <span class="c"># corr(A_x-h, B) == corr(B_x+h, A)</span>
+        <span class="n">A</span><span class="p">,</span><span class="n">B</span> <span class="o">=</span> <span class="n">B</span><span class="p">,</span><span class="n">A</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+    <span class="n">b_max</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">h</span>
+    <span class="n">a_max</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">h</span> <span class="o">&gt;=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">b_max</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="s">&#39;Lag causes zero-length or negative length arrays!&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">corsubs</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span><span class="n">a_max</span><span class="p">],</span> <span class="n">B</span><span class="p">[</span><span class="o">...</span><span class="p">,:</span><span class="n">b_max</span><span class="p">],</span> <span class="n">axis</span><span class="p">,</span> <span class="n">standardized</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="trim"><a class="viewcode-back" href="../../api/pycorr.funcs_correlate.html#pycorr.funcs_correlate.trim">[docs]</a><span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ends</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">h</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns Array with last dim trimmed</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        A   : n-dim array</span>
+<span class="sd">        ends: how much trim from each end, e.g. (10, -10)</span>
+<span class="sd">        h   : specify how much to trim from one side. Overrides that argument in ends.</span>
+
+<span class="sd">    TODO: h is a weird option (and you never use it)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ends</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ends</span><span class="p">)</span>
+    <span class="n">ends</span><span class="p">[</span><span class="n">h</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span>
+    <span class="k">return</span> <span class="n">A</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">ends</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="n">ends</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="bp">None</span><span class="p">]</span>
+
+</div>
+<div class="viewcode-block" id="shift"><a class="viewcode-back" href="../../api/pycorr.funcs_correlate.html#pycorr.funcs_correlate.shift">[docs]</a><span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">outlen</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>             <span class="c">#TODO remove offset arg?</span>
+    <span class="sd">&quot;&quot;&quot;Shifts entire time series by h. If h is negative, pad beginning with NaN&quot;&quot;&quot;</span>
+    <span class="n">h</span> <span class="o">-=</span> <span class="n">offset</span>
+    <span class="k">if</span> <span class="n">h</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> 
+        <span class="c">#raise BaseException(&#39;after adjusting for offset, h is negative.  Cannot keep outlen.&#39;)</span>
+        <span class="c">#pad = np.vstack([np.nan]*(-h))</span>
+        <span class="n">pad</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">A</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">h</span> <span class="p">:</span> <span class="n">outlen</span> <span class="ow">and</span> <span class="n">outlen</span><span class="o">+</span><span class="n">h</span><span class="p">]</span>
+
+</div>
+<div class="viewcode-block" id="roimask"><a class="viewcode-back" href="../../api/pycorr.funcs_correlate.html#pycorr.funcs_correlate.roimask">[docs]</a><span class="k">def</span> <span class="nf">roimask</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">roi</span><span class="p">,</span> <span class="n">filter_func</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">proc_func</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">mean_ts</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mask data using values in roi &gt; 0</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    data -- numpy array to be masked</span>
+<span class="sd">    roi -- array to be checked for nonzero values</span>
+<span class="sd">    filter_func -- function to further subset roi (e.g. remove time courses with mean &lt; 6000)</span>
+<span class="sd">    proc_func -- TODO</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span> <span class="n">roi</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span> <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">[:,:,:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">shapes</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">roi</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">]:</span> <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="s">&#39;roi shape: </span><span class="si">%s</span><span class="s"> </span><span class="se">\n</span><span class="s">data shape: </span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="n">shapes</span><span class="p">)</span>
+    <span class="n">roi_indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+    <span class="n">roi</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">roi_indx</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">filter_func</span><span class="p">:</span> <span class="n">roi</span><span class="p">[</span><span class="n">filter_func</span><span class="p">(</span><span class="n">roi</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">if</span> <span class="n">mean_ts</span><span class="p">:</span> <span class="n">roi</span> <span class="o">=</span> <span class="n">nanmean</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">roi</span>
+
+</div>
+<div class="viewcode-block" id="load_roi"><a class="viewcode-back" href="../../api/pycorr.funcs_correlate.html#pycorr.funcs_correlate.load_roi">[docs]</a><span class="k">def</span> <span class="nf">load_roi</span><span class="p">(</span><span class="n">nii</span><span class="p">,</span> <span class="n">thresh</span><span class="o">=</span><span class="mi">6000</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">outlen</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">meantc</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load a nifti file and apply several functions to it.</span>
+
+<span class="sd">    nii -- name of nifti to load or ndarray</span>
+<span class="sd">    standardize -- return all tcs with mean = 0 and stdev = 1</span>
+<span class="sd">    outlen -- specify how long resultant tcs should be, pad if necessary</span>
+<span class="sd">    padding -- function to apply to ndarray, must take axis=-1 argument</span>
+<span class="sd">    meantc -- return the meantc over all voxels (before evaluating standardize)</span>
+
+<span class="sd">    TODO: fix default outlen arg</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">nii</span><span class="p">,</span> <span class="s">&#39;shape&#39;</span><span class="p">):</span> <span class="n">nii</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">nii</span><span class="p">)</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+    <span class="n">nii</span><span class="p">[</span><span class="n">nii</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">thresh</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="k">if</span> <span class="n">meantc</span><span class="p">:</span> <span class="n">out</span> <span class="o">=</span> <span class="n">nanmean</span><span class="p">(</span><span class="n">nii</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nii</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c">#USE apply_over_axes instead?</span>
+    <span class="k">else</span><span class="p">:</span> <span class="n">out</span> <span class="o">=</span> <span class="n">nii</span>
+
+    <span class="k">if</span> <span class="n">standardize</span><span class="p">:</span> <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">out</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])</span> <span class="o">/</span> <span class="n">out</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="c">#this is unruly, use the current standardize func</span>
+    <span class="n">outdiff</span> <span class="o">=</span> <span class="n">outlen</span> <span class="o">-</span> <span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">outdiff</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">padding</span><span class="p">,</span> <span class="s">&#39;func_name&#39;</span><span class="p">):</span> <span class="n">padding</span> <span class="o">=</span> <span class="n">padding</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>    <span class="c">#call padding if it is a function</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">out</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">padding</span><span class="p">]</span><span class="o">*</span><span class="n">outdiff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">outlen</span><span class="p">]</span> 
+    <span class="k">return</span> <span class="n">out</span></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Michael Chow.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,257 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>statistics &mdash; pycorr 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pycorr 0.1 documentation" href="../index.html"/>
+        <link rel="up" title="API Reference" href="index.html"/>
+        <link rel="next" title="subject" href="pycorr.subject.html"/>
+        <link rel="prev" title="pietools" href="pycorr.pietools.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../index.html" class="fa fa-home"> pycorr</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#python">Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#installing-dependencies">Installing Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#installing-pycorr-on-rondo">Installing pycorr on Rondo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#example-pipeline">Example Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pycorr.html"><tt class="docutils literal"><span class="pre">pycorr</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.cli.html"><tt class="docutils literal"><span class="pre">cli</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.funcs_correlate.html"><tt class="docutils literal"><span class="pre">funcs_correlate</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.gen_corrmat.html"><tt class="docutils literal"><span class="pre">gen_corrmat</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.pietools.html"><tt class="docutils literal"><span class="pre">pietools</span></tt></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href=""><tt class="docutils literal"><span class="pre">statistics</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.subject.html"><tt class="docutils literal"><span class="pre">subject</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.workflows.html"><tt class="docutils literal"><span class="pre">workflows</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">pycorr</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+      
+    <li><tt class="docutils literal"><span class="pre">statistics</span></tt></li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="../_sources/api/pycorr.statistics.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="module-pycorr.statistics">
+<span id="statistics"></span><h1><tt class="xref py py-mod docutils literal"><span class="pre">statistics</span></tt><a class="headerlink" href="#module-pycorr.statistics" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pycorr.statistics.isc_corrmat_within_diff">
+<tt class="descclassname">pycorr.statistics.</tt><tt class="descname">isc_corrmat_within_diff</tt><big>(</big><em>indxA</em>, <em>indxB</em>, <em>C</em><big>)</big><a class="reference internal" href="../_modules/pycorr/statistics.html#isc_corrmat_within_diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.statistics.isc_corrmat_within_diff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Faster within-group subject-total correlation contrast using correlation matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>indxA</strong> (<em>list</em>) &#8211; list of indices corresponding to group A members.</li>
+<li><strong>indxB</strong> (<em>list</em>) &#8211; likewise for group B (should be no overlap)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">ndarray with isc for A minus isc for B.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.statistics.isc_within_diff">
+<tt class="descclassname">pycorr.statistics.</tt><tt class="descname">isc_within_diff</tt><big>(</big><em>A</em>, <em>B</em>, <em>standardized=False</em><big>)</big><a class="reference internal" href="../_modules/pycorr/statistics.html#isc_within_diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.statistics.isc_within_diff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contrast within-group subject-total correlation for A and B.</p>
+<p>This function operates on the timecourse data, so is slower
+than isc_corrmat_within_diff. Inputs may be multi-dimensional.
+The last dimension is used for correlations (e.g. time should be last).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>A</strong> (<em>list</em>) &#8211; List of timecourse data for each member of group A.</li>
+<li><strong>B</strong> (<em>list</em>) &#8211; Timecourses of same length as A.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">ndarray with isc for A minus isc for B.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.statistics.perm">
+<tt class="descclassname">pycorr.statistics.</tt><tt class="descname">perm</tt><big>(</big><em>A</em>, <em>B</em>, <em>fun</em>, <em>nreps=1</em>, <em>out=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pycorr/statistics.html#perm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.statistics.perm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Permutation test. Randomly shuffles group labels, then runs fun. Group
+sizes are preserved.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>A</strong> &#8211; lists with elements (or indices) to permute across groups</li>
+<li><strong>B</strong> &#8211; similar to A, but other group</li>
+<li><strong>fun</strong> &#8211; function of form fun(new_A, new_B, [opt1, ... ,])</li>
+<li><strong>nreps</strong> &#8211; number of repetitions</li>
+<li><strong>out</strong> &#8211; optional container for results (e.g. numpy array with dtype)</li>
+<li><strong>kwargs</strong> &#8211; optional parameters passed to fun</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pycorr.subject.html" class="btn btn-neutral float-right" title="subject"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pycorr.pietools.html" class="btn btn-neutral" title="pietools"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Michael Chow.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

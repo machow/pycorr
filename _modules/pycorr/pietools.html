@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pycorr.pietools &mdash; pycorr 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pycorr 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> pycorr</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#python">Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#installing-dependencies">Installing Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#installing-pycorr-on-rondo">Installing pycorr on Rondo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial.html#example-pipeline">Example Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.html"><tt class="docutils literal"><span class="pre">pycorr</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.cli.html"><tt class="docutils literal"><span class="pre">cli</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.funcs_correlate.html"><tt class="docutils literal"><span class="pre">funcs_correlate</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.gen_corrmat.html"><tt class="docutils literal"><span class="pre">gen_corrmat</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.pietools.html"><tt class="docutils literal"><span class="pre">pietools</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.statistics.html"><tt class="docutils literal"><span class="pre">statistics</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.subject.html"><tt class="docutils literal"><span class="pre">subject</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.workflows.html"><tt class="docutils literal"><span class="pre">workflows</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">pycorr</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>pycorr.pietools</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for pycorr.pietools</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span><span class="p">,</span> <span class="n">walk</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="k">try</span><span class="p">:</span> <span class="kn">import</span> <span class="nn">dicom</span>
+<span class="k">except</span><span class="p">:</span> <span class="s">&quot;lib &#39;dicom&#39; unavailable&quot;</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="kn">as</span> <span class="nn">nib</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="is_numeric"><a class="viewcode-back" href="../../api/pycorr.pietools.html#pycorr.pietools.is_numeric">[docs]</a><span class="k">def</span> <span class="nf">is_numeric</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks for numeric-like objects.&quot;&quot;&quot;</span>
+    <span class="n">attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;__add__&#39;</span><span class="p">,</span> <span class="s">&#39;__sub__&#39;</span><span class="p">,</span> <span class="s">&#39;__mul__&#39;</span><span class="p">,</span> <span class="s">&#39;__div__&#39;</span><span class="p">,</span> <span class="s">&#39;__pow__&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="load_nii_or_npy"><a class="viewcode-back" href="../../api/pycorr.pietools.html#pycorr.pietools.load_nii_or_npy">[docs]</a><span class="k">def</span> <span class="nf">load_nii_or_npy</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;convenience function to load nib or np filetypes&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;.npy&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="copy_nii_hdr"><a class="viewcode-back" href="../../api/pycorr.pietools.html#pycorr.pietools.copy_nii_hdr">[docs]</a><span class="k">def</span> <span class="nf">copy_nii_hdr</span><span class="p">(</span><span class="n">nii</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a nifti object using another nifti&#39;s header</span>
+<span class="sd">    </span>
+<span class="sd">    Dimensions are changed to correspond with data shape</span>
+
+<span class="sd">    parameters:</span>
+<span class="sd">        nii - nifti file to take header from</span>
+<span class="sd">        data - data file to convert to Nifti1Image</span>
+<span class="sd">        save - file name to save to, no save if blank</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">nii</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span> <span class="n">nii</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">nii</span><span class="p">)</span>
+    <span class="n">hdr</span> <span class="o">=</span> <span class="n">nii</span><span class="o">.</span><span class="n">get_header</span><span class="p">()</span>
+    <span class="n">affine</span> <span class="o">=</span> <span class="n">nii</span><span class="o">.</span><span class="n">get_affine</span><span class="p">()</span>
+    <span class="n">new_hdr</span> <span class="o">=</span> <span class="n">hdr</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">new_hdr</span><span class="o">.</span><span class="n">set_data_shape</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">new_nii</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">new_hdr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">save</span><span class="p">:</span> <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">new_nii</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_nii</span>
+
+</div>
+<div class="viewcode-block" id="query_to_re_groups"><a class="viewcode-back" href="../../api/pycorr.pietools.html#pycorr.pietools.query_to_re_groups">[docs]</a><span class="k">def</span> <span class="nf">query_to_re_groups</span><span class="p">(</span><span class="n">query</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For a string with with glob syntax, allow for named groups for wildcards</span>
+<span class="sd">    </span>
+<span class="sd">    E.g. &quot;*/{sub_id}/file.txt&quot; is converted to a regular expression where {sub_id} is a wildcard,</span>
+<span class="sd">         and it&#39;s match is a group named sub_id.</span>
+<span class="sd">        </span>
+<span class="sd">    Supports multiple {bracketed_args}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">var_matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="s">&#39;{(?P&lt;var&gt;.*?)}&#39;</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+    <span class="n">glob_exp</span> <span class="o">=</span> <span class="n">query</span>
+    <span class="n">re_exp</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">var_matches</span><span class="p">:</span> 
+        <span class="n">glob_exp</span> <span class="o">=</span> <span class="n">glob_exp</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">m</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s">&#39;var&#39;</span><span class="p">]:</span> <span class="s">&#39;*&#39;</span><span class="p">})</span>
+        <span class="n">re_group_exp</span> <span class="o">=</span> <span class="s">&#39;(?P&lt;</span><span class="si">%s</span><span class="s">&gt;.*?)&#39;</span><span class="o">%</span><span class="n">m</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s">&#39;var&#39;</span><span class="p">]</span>
+        <span class="n">re_exp</span> <span class="o">=</span> <span class="n">re_exp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()),</span> <span class="n">re_group_exp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">glob_exp</span><span class="p">,</span> <span class="n">re_exp</span>
+
+</div>
+<div class="viewcode-block" id="subs_getfile"><a class="viewcode-back" href="../../api/pycorr.pietools.html#pycorr.pietools.subs_getfile">[docs]</a><span class="k">def</span> <span class="nf">subs_getfile</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">matchme</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Recursively find all matching files, return as dictionary with entry for each subdir</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    dirname -- directory to search</span>
+<span class="sd">    matchme -- string to match.  May use wildcards (glob used)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">matches</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">subs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">subs</span><span class="p">:</span>
+        <span class="n">matches</span><span class="p">[</span><span class="n">sub</span><span class="p">]</span> <span class="o">=</span> <span class="n">searchr</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">sub</span><span class="p">),</span> <span class="n">matchme</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">matches</span>
+</div>
+<div class="viewcode-block" id="sort_int_folder"><a class="viewcode-back" href="../../api/pycorr.pietools.html#pycorr.pietools.sort_int_folder">[docs]</a><span class="k">def</span> <span class="nf">sort_int_folder</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sort a folder with files of form {INT}.ext into ascending, numeric order&quot;&quot;&quot;</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span>
+</div>
+<span class="k">def</span> <span class="nf">splice_dir</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">mmap</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+    <span class="n">sort_int_folder</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span> <span class="n">mmap_mode</span><span class="o">=</span><span class="n">mmap</span><span class="p">)</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">files</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">save</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dirname</span> <span class="o">+</span> <span class="s">&#39;.npy&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+<span class="kn">import</span> <span class="nn">errno</span>
+
+<span class="k">def</span> <span class="nf">mkdir_p</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span> <span class="c"># Python &gt;2.5</span>
+            <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EEXIST</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span> <span class="k">raise</span>
+
+<span class="c"># Script functions ------------------------------------------------------------</span>
+<span class="k">def</span> <span class="nf">parse_section</span><span class="p">(</span><span class="n">snapshot</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">snapshot</span> <span class="o">==</span> <span class="s">&#39;all&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">slice</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">snapshot</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span> <span class="k">else</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">section</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;snapshots input incorrect&#39;</span><span class="p">)</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="o">*</span><span class="n">section</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">section</span>
+
+<span class="kn">import</span> <span class="nn">gc</span>
+<div class="viewcode-block" id="arr_slice"><a class="viewcode-back" href="../../api/pycorr.pietools.html#pycorr.pietools.arr_slice">[docs]</a><span class="k">def</span> <span class="nf">arr_slice</span><span class="p">(</span><span class="n">nii_file</span><span class="p">,</span> <span class="n">_slice</span><span class="p">):</span>
+    <span class="s">&quot;slices indx from first dim from matrix, for parallelization&quot;</span>
+    <span class="k">print</span> <span class="s">&#39;loading data&#39;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">nii_file</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c">#nii = nib.load(nii_file)</span>
+        <span class="c">#dat = nii.get_data()</span>
+        <span class="c">#del nii</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="n">load_nii_or_npy</span><span class="p">(</span><span class="n">nii_file</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> <span class="n">dat</span> <span class="o">=</span> <span class="n">nii_file</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">_slice</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">del</span> <span class="n">dat</span>                   <span class="c">#garbage collection</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+<span class="c">######################</span>
+</div>
+<div class="viewcode-block" id="searchr"><a class="viewcode-back" href="../../api/pycorr.pietools.html#pycorr.pietools.searchr">[docs]</a><span class="k">def</span> <span class="nf">searchr</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">matchme</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Walk dir, return list of all matches.  Use glob to match.&quot;&quot;&quot;</span>
+
+    <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">subfold</span><span class="p">,</span> <span class="n">fnames</span> <span class="ow">in</span> <span class="n">walk</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">matchme</span><span class="p">)):</span>
+            <span class="n">matches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="k">print</span> <span class="s">&quot;&quot;&quot;{subfold}: </span><span class="se">\t\t</span><span class="s">{files}&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subfold</span> <span class="o">=</span> <span class="n">root</span><span class="p">,</span> <span class="n">files</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">matches</span>
+
+
+</div>
+<div class="viewcode-block" id="print_Blocks"><a class="viewcode-back" href="../../api/pycorr.pietools.html#pycorr.pietools.print_Blocks">[docs]</a><span class="k">def</span> <span class="nf">print_Blocks</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Given subject dir, print number of TRs for each block&quot;&quot;&quot;</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;Can&#39;t parse some file names.  Are there other files in the directory?  Correcting..&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">blocks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]):</span>
+        <span class="k">print</span> <span class="s">&#39;Block </span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="n">b</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="nb">max</span><span class="p">([</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">])</span>
+
+</div>
+<div class="viewcode-block" id="loadwith"><a class="viewcode-back" href="../../api/pycorr.pietools.html#pycorr.pietools.loadwith">[docs]</a><span class="k">def</span> <span class="nf">loadwith</span><span class="p">(</span><span class="n">subdir</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For all subs in basedir, apply func to path, return list.</span>
+
+<span class="sd">    Parameteres:</span>
+<span class="sd">    subdir --	base directory to iterate through. If none, just glob path.</span>
+<span class="sd">    path --	path to search for in each dir in subdir</span>
+<span class="sd">    func --	function to apply to each path found</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">subdir</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">subdir</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subdir</span><span class="p">,</span> <span class="n">sub</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">sub</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fnames</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">fnames</span><span class="p">:</span>
+            <span class="n">subj</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">name</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">9</span><span class="p">]</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">subj</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span>
+<span class="c">#########</span>
+<span class="c">###</span>
+<span class="c">###</span>
+</div>
+<span class="k">def</span> <span class="nf">print_dicom</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+    <span class="n">lookup</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;SeriesNumber&#39;</span><span class="p">,</span> <span class="s">&#39;SeriesDescription&#39;</span><span class="p">]</span>
+    <span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tallies</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">fnames</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">fnames</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span>
+    <span class="nb">sorted</span><span class="p">(</span><span class="n">fnames</span><span class="p">,</span> <span class="n">reverse</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">fnames</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">dicom</span><span class="o">.</span><span class="n">ReadFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span> <span class="n">force</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="n">hdr</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="s">&quot;NO </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">entry</span><span class="p">))</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">lookup</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">+=</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdr</span><span class="p">)</span>
+            <span class="n">tallies</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">hdr</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hdr</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">count</span><span class="p">)])</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">tallies</span>
+
+<span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+    <span class="k">print</span> <span class="p">[</span><span class="n">ii</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">dirname</span><span class="p">)][:</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Michael Chow.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

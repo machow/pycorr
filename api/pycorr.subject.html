@@ -1,0 +1,264 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>subject &mdash; pycorr 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pycorr 0.1 documentation" href="../index.html"/>
+        <link rel="up" title="API Reference" href="index.html"/>
+        <link rel="next" title="workflows" href="pycorr.workflows.html"/>
+        <link rel="prev" title="statistics" href="pycorr.statistics.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../index.html" class="fa fa-home"> pycorr</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#python">Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#installing-dependencies">Installing Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#installing-pycorr-on-rondo">Installing pycorr on Rondo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#example-pipeline">Example Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pycorr.html"><tt class="docutils literal"><span class="pre">pycorr</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.cli.html"><tt class="docutils literal"><span class="pre">cli</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.funcs_correlate.html"><tt class="docutils literal"><span class="pre">funcs_correlate</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.gen_corrmat.html"><tt class="docutils literal"><span class="pre">gen_corrmat</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.pietools.html"><tt class="docutils literal"><span class="pre">pietools</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.statistics.html"><tt class="docutils literal"><span class="pre">statistics</span></tt></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href=""><tt class="docutils literal"><span class="pre">subject</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.workflows.html"><tt class="docutils literal"><span class="pre">workflows</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">pycorr</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+      
+    <li><tt class="docutils literal"><span class="pre">subject</span></tt></li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="../_sources/api/pycorr.subject.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="module-pycorr.subject">
+<span id="subject"></span><h1><tt class="xref py py-mod docutils literal"><span class="pre">subject</span></tt><a class="headerlink" href="#module-pycorr.subject" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pycorr.subject.AttrArray">
+<em class="property">class </em><tt class="descclassname">pycorr.subject.</tt><tt class="descname">AttrArray</tt><a class="reference internal" href="../_modules/pycorr/subject.html#AttrArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.subject.AttrArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subclass of ndarray. Provides attributes property to match hdf5 dset.</p>
+<p>This is used when data are not loaded into hdf5, but externally</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pycorr.subject.Cond">
+<em class="property">class </em><tt class="descclassname">pycorr.subject.</tt><tt class="descname">Cond</tt><a class="reference internal" href="../_modules/pycorr/subject.html#Cond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.subject.Cond" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="pycorr.subject.Exp">
+<em class="property">class </em><tt class="descclassname">pycorr.subject.</tt><tt class="descname">Exp</tt><big>(</big><em>f</em><big>)</big><a class="reference internal" href="../_modules/pycorr/subject.html#Exp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.subject.Exp" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="staticmethod">
+<dt id="pycorr.subject.Exp.get_subject_files">
+<em class="property">static </em><tt class="descname">get_subject_files</tt><big>(</big><em>globpath</em><big>)</big><a class="reference internal" href="../_modules/pycorr/subject.html#Exp.get_subject_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.subject.Exp.get_subject_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterator. Returns re match object for each matching path.</p>
+<p>Full path accessed using m.group(); args from m.groupdict()</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycorr.subject.Exp.iter_runs">
+<tt class="descname">iter_runs</tt><big>(</big><em>condname</em>, <em>group=None</em><big>)</big><a class="reference internal" href="../_modules/pycorr/subject.html#Exp.iter_runs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.subject.Exp.iter_runs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate through all subjects and all runs within subject. Yield run with same name as run attr in cond</p>
+<p>Parameters:
+condname &#8211;  string specifying condition or condition object
+group    &#8211;  group name that must also match in the group attr for each run</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pycorr.subject.Run">
+<em class="property">class </em><tt class="descclassname">pycorr.subject.</tt><tt class="descname">Run</tt><big>(</big><em>h5grp</em><big>)</big><a class="reference internal" href="../_modules/pycorr/subject.html#Run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.subject.Run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to wrap /Subjects/sub_id/Cond group</p>
+<dl class="method">
+<dt id="pycorr.subject.Run.create_dataset">
+<tt class="descname">create_dataset</tt><big>(</big><em>data</em>, <em>overwrite=False</em>, <em>reference=False</em>, <em>compression='gzip'</em>, <em>chunks=(1</em>, <em>)</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pycorr/subject.html#Run.create_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.subject.Run.create_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data can be np.ndarray, nifti, or file name. Remaining dimensions for chunks are inferred from data</p>
+<p>Even if ref is True, still loads data (to ensure it exists)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycorr.subject.Run.fill_attributes">
+<tt class="descname">fill_attributes</tt><big>(</big><em>offset=0</em>, <em>max_len=None</em>, <em>exclude=False</em>, <em>notes=''</em>, <em>reference=False</em>, <em>subset=False</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pycorr/subject.html#Run.fill_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.subject.Run.fill_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kwargs are unused (there to soak up uneccesary args)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycorr.subject.Run.load">
+<tt class="descname">load</tt><big>(</big><em>use_subset=True</em>, <em>standardized=False</em>, <em>threshold=False</em>, <em>roi=False</em>, <em>_slice=None</em><big>)</big><a class="reference internal" href="../_modules/pycorr/subject.html#Run.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.subject.Run.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return data as a numpy array. Uses data attributes to shift, and (optionally) threshold.
+Final ROI timecourses are standardized.</p>
+<p>Parameters:
+subset       &#8211;  boolean mask for subsetting timecourse
+standardized &#8211;  demean and scale timecourse for each voxel
+threshold    &#8211;  set thresholded values to nan
+roi          &#8211;  roi mask to subset spatial dims
+_slice       &#8211;  slice along first dimension to take</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycorr.subject.Run.threshold">
+<tt class="descname">threshold</tt><big>(</big><em>threshold</em>, <em>data=None</em>, <em>save=False</em><big>)</big><a class="reference internal" href="../_modules/pycorr/subject.html#Run.threshold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.subject.Run.threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean mask of values below threshold or that are nan.</p>
+<p>Parameters:
+threshold &#8211; value that mean timecourse must exceed
+data      &#8211; if given, threshold this data set. Otherwise, load run data.
+save      &#8211; save threshold to dataset &#8220;threshold&#8221; in addition to returning</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pycorr.workflows.html" class="btn btn-neutral float-right" title="workflows"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pycorr.statistics.html" class="btn btn-neutral" title="statistics"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Michael Chow.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

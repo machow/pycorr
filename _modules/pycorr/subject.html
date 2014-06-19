@@ -1,0 +1,511 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pycorr.subject &mdash; pycorr 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pycorr 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> pycorr</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#python">Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#installing-dependencies">Installing Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup.html#installing-pycorr-on-rondo">Installing pycorr on Rondo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorial.html#example-pipeline">Example Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.html"><tt class="docutils literal"><span class="pre">pycorr</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.cli.html"><tt class="docutils literal"><span class="pre">cli</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.funcs_correlate.html"><tt class="docutils literal"><span class="pre">funcs_correlate</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.gen_corrmat.html"><tt class="docutils literal"><span class="pre">gen_corrmat</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.pietools.html"><tt class="docutils literal"><span class="pre">pietools</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.statistics.html"><tt class="docutils literal"><span class="pre">statistics</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.subject.html"><tt class="docutils literal"><span class="pre">subject</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/pycorr.workflows.html"><tt class="docutils literal"><span class="pre">workflows</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">pycorr</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>pycorr.subject</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for pycorr.subject</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="kn">as</span> <span class="nn">nib</span>
+<span class="kn">from</span> <span class="nn">funcs_correlate</span> <span class="kn">import</span> <span class="n">shift</span><span class="p">,</span> <span class="n">standardize</span>
+<span class="kn">from</span> <span class="nn">pietools</span> <span class="kn">import</span> <span class="n">load_nii_or_npy</span><span class="p">,</span> <span class="n">is_numeric</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="AttrArray"><a class="viewcode-back" href="../../api/pycorr.subject.html#pycorr.subject.AttrArray">[docs]</a><span class="k">class</span> <span class="nc">AttrArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subclass of ndarray. Provides attributes property to match hdf5 dset.</span>
+<span class="sd">    </span>
+<span class="sd">    This is used when data are not loaded into hdf5, but externally&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_arr</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">np_arr</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">attrs</span>
+        <span class="k">return</span> <span class="n">obj</span>
+</div>
+<div class="viewcode-block" id="Run"><a class="viewcode-back" href="../../api/pycorr.subject.html#pycorr.subject.Run">[docs]</a><span class="k">class</span> <span class="nc">Run</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class to wrap /Subjects/sub_id/Cond group&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h5grp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load individual scan, given Group object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grp</span> <span class="o">=</span> <span class="n">h5grp</span>
+        <span class="c">#self.data    = h5grp[&#39;data&#39;]    if &#39;data&#39;   in h5grp else None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thresh</span>  <span class="o">=</span> <span class="n">h5grp</span><span class="p">[</span><span class="s">&#39;thresh&#39;</span><span class="p">]</span>  <span class="k">if</span> <span class="s">&#39;thresh&#39;</span> <span class="ow">in</span> <span class="n">h5grp</span> <span class="k">else</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">h5grp</span><span class="o">.</span><span class="n">attrs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;data&#39;</span><span class="p">):</span> <span class="k">return</span> <span class="bp">None</span>            <span class="c"># no data exists</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span>
+        <span class="k">if</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;reference&#39;</span><span class="p">):</span>
+            <span class="n">d</span> <span class="o">=</span>  <span class="n">load_nii_or_npy</span><span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;reference&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">AttrArray</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>                      <span class="c"># data from external npy or nifti</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span>                         <span class="c"># data from hdf5</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;subset&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>              <span class="c"># load from string</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="s">&#39;shape&#39;</span><span class="p">):</span>       <span class="c"># boolean array</span>
+            <span class="k">return</span> <span class="n">sub</span>
+        <span class="k">else</span><span class="p">:</span>                             <span class="c"># no subset</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        
+<div class="viewcode-block" id="Run.load"><a class="viewcode-back" href="../../api/pycorr.subject.html#pycorr.subject.Run.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_subset</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">standardized</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">_slice</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return data as a numpy array. Uses data attributes to shift, and (optionally) threshold.</span>
+<span class="sd">        Final ROI timecourses are standardized.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        subset       --  boolean mask for subsetting timecourse</span>
+<span class="sd">        standardized --  demean and scale timecourse for each voxel</span>
+<span class="sd">        threshold    --  set thresholded values to nan</span>
+<span class="sd">        roi          --  roi mask to subset spatial dims</span>
+<span class="sd">        _slice       --  slice along first dimension to take</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Subset loading</span>
+        <span class="n">sub_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;subset&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">is_numeric</span><span class="p">(</span><span class="n">use_subset</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">use_subset</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">bool</span><span class="p">:</span>     <span class="c"># subset given</span>
+            <span class="n">subset</span> <span class="o">=</span> <span class="n">use_subset</span>
+        <span class="k">elif</span> <span class="n">use_subset</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">sub_path</span><span class="p">):</span>                         <span class="c"># else use from run attrs</span>
+            <span class="n">subset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sub_path</span><span class="p">)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">sub_path</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">sub_path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">subset</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>           <span class="c">#to preserve array shapes when subsetting</span>
+        <span class="k">print</span> <span class="n">subset</span>
+
+        <span class="c"># ROI </span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">roi</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">threshold</span><span class="p">:</span> <span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span> <span class="o">&amp;</span> <span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">thresh</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+            <span class="n">M_roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">][</span><span class="n">roi</span><span class="p">]</span>
+            <span class="n">shifted</span> <span class="o">=</span> <span class="n">shift</span><span class="p">(</span><span class="n">M_roi</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;offset&#39;</span><span class="p">],</span> <span class="n">outlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;max_len&#39;</span><span class="p">])</span>   <span class="c">#shift last dim forward h</span>
+            <span class="n">final</span> <span class="o">=</span> <span class="n">shifted</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">subset</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">standardized</span><span class="p">:</span> <span class="n">standardize</span><span class="p">(</span><span class="n">final</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">standardize</span><span class="p">(</span><span class="n">final</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>               <span class="c">#restandardize, and collapse the vox X ts 2D mat TODO: why is this done?</span>
+
+        <span class="c"># Full 4D array</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">_slice</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span><span class="o">...</span><span class="p">]</span> <span class="k">if</span> <span class="n">_slice</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>           <span class="c"># sliced (for parallel jobs)</span>
+            <span class="n">shifted</span> <span class="o">=</span> <span class="n">shift</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;offset&#39;</span><span class="p">],</span> <span class="n">outlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;max_len&#39;</span><span class="p">])</span>   <span class="c"># shift last dim forward h</span>
+            <span class="n">final</span> <span class="o">=</span> <span class="n">shifted</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">subset</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">standardized</span><span class="p">:</span> <span class="n">standardize</span><span class="p">(</span><span class="n">final</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">threshold</span><span class="p">:</span> 
+                <span class="n">thresh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresh</span><span class="p">[</span><span class="n">_slice</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span><span class="o">...</span><span class="p">]</span> <span class="k">if</span> <span class="n">_slice</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresh</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+                <span class="n">final</span><span class="p">[</span><span class="n">thresh</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        
+            <span class="k">return</span> <span class="n">final</span>
+</div>
+<div class="viewcode-block" id="Run.threshold"><a class="viewcode-back" href="../../api/pycorr.subject.html#pycorr.subject.Run.threshold">[docs]</a>    <span class="k">def</span> <span class="nf">threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Boolean mask of values below threshold or that are nan.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        threshold -- value that mean timecourse must exceed</span>
+<span class="sd">        data      -- if given, threshold this data set. Otherwise, load run data.</span>
+<span class="sd">        save      -- save threshold to dataset &quot;threshold&quot; in addition to returning</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+        <span class="n">thresh_mask</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">)</span>    <span class="c">#thresh anything not over threshold (including nan)</span>
+        
+        <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thresh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">require_dataset</span><span class="p">(</span><span class="s">&#39;thresh&#39;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresh</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">thresh_mask</span><span class="o">.</span><span class="n">shape</span>           <span class="c">#TODO create thresh if not exist</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thresh</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">thresh_mask</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thresh</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">thresh_mask</span>
+</div>
+<div class="viewcode-block" id="Run.create_dataset"><a class="viewcode-back" href="../../api/pycorr.subject.html#pycorr.subject.Run.create_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s">&#39;gzip&#39;</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Data can be np.ndarray, nifti, or file name. Remaining dimensions for chunks are inferred from data</span>
+<span class="sd">        </span>
+<span class="sd">        Even if ref is True, still loads data (to ensure it exists)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#TODO should fill attributes be mandatory?</span>
+        <span class="c">#TODO ref and overwrite args</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">overwrite</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="s">&#39;data already exists&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span> <span class="n">np_arr</span> <span class="o">=</span> <span class="n">load_nii_or_npy</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>                <span class="c">#string</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">is</span> <span class="n">nib</span><span class="o">.</span><span class="n">nifti1</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">:</span> <span class="n">np_arr</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span> <span class="c">#nifti</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">np_arr</span> <span class="o">=</span> <span class="n">data</span>                                                 <span class="c">#np array</span>
+        <span class="c">#rdy_arr = np_arr.reshape([-1, np_arr.shape[-1]])</span>
+        <span class="n">chunks</span> <span class="o">+=</span> <span class="n">np_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">):]</span>             <span class="c">#fill in rest of chunk information</span>
+        <span class="k">if</span> <span class="n">reference</span><span class="p">:</span>
+           <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&#39;data&#39;</span><span class="p">)</span>                 <span class="c">#make dummy group for attrs </span>
+           <span class="n">reference</span> <span class="o">=</span> <span class="n">data</span>                              <span class="c"># file path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s">&#39;data&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">np_arr</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_attributes</span><span class="p">(</span><span class="n">reference</span><span class="o">=</span><span class="n">reference</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="c">#self.data.attrs[&#39;shape&#39;] = np_arr.shape</span>
+</div>
+<div class="viewcode-block" id="Run.fill_attributes"><a class="viewcode-back" href="../../api/pycorr.subject.html#pycorr.subject.Run.fill_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">fill_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">notes</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="c">#TODO should initial arguments be set from Exp setup, so they can be in the yaml?</span>
+        <span class="sd">&quot;&quot;&quot;Kwargs are unused (there to soak up uneccesary args)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="s">&#39;data does not exist&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">max_len</span><span class="p">:</span> <span class="n">max_len</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;offset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">offset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;max_len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;exclude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exclude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;notes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">notes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;reference&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reference</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;subset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span>
+        <span class="c">#&#39;blocks&#39;: pandas,</span>
+        <span class="c">#nii_hdr,</span>
+        <span class="c">#&#39;date_scanned&#39;: unix date?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</div>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_cond</span><span class="p">):</span>
+        <span class="n">g_sub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">if</span> <span class="n">new_cond</span> <span class="ow">in</span> <span class="n">g_sub</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;group </span><span class="si">%s</span><span class="s"> already exists&quot;</span><span class="o">%</span><span class="n">new_cond</span><span class="p">)</span>  <span class="c">#otherwise will create as subgroup</span>
+        <span class="n">g_sub</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">new_cond</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Run</span><span class="p">(</span><span class="n">g_sub</span><span class="p">[</span><span class="n">new_cond</span><span class="p">])</span>
+        
+    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&#39;Data:</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">print</span> <span class="s">&#39;thresh:</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresh</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span> 
+            <span class="k">print</span> <span class="s">&quot;{:{}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">width</span><span class="p">),</span> <span class="s">&#39;:    &#39;</span><span class="p">,</span> <span class="n">val</span>
+
+</div>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pietools</span> <span class="kn">import</span> <span class="n">query_to_re_groups</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">funcs_correlate</span> <span class="kn">import</span> <span class="n">sum_tc</span>
+
+<div class="viewcode-block" id="Exp"><a class="viewcode-back" href="../../api/pycorr.subject.html#pycorr.subject.Exp">[docs]</a><span class="k">class</span> <span class="nc">Exp</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">f</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;conds&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">create_conds</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="c">#if &#39;data_storage&#39; in config:</span>
+        <span class="c">#    for k,v in config[&#39;data_storage&#39;].iteritems():</span>
+        <span class="c">#        self.f.attrs[k] = v</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&#39;subjects&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&#39;rois&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&#39;conds&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;sub_folder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;sub_folder&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;sub_folder&#39;</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">:</span> <span class="k">pass</span> <span class="c">#TODO add exception expected</span>
+
+        <span class="c">#Load roi files in from config</span>
+        <span class="k">if</span> <span class="s">&#39;roi_files&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">m_roi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_subject_files</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;roi_files&#39;</span><span class="p">]):</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="n">m_roi</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+                <span class="n">roi_id</span><span class="o">=</span> <span class="n">m_roi</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s">&#39;roi_id&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_roi</span><span class="p">(</span><span class="n">roi_id</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="c">#create new conditions</span>
+        <span class="k">if</span> <span class="n">create_conds</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">condname</span><span class="p">,</span> <span class="n">cond</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;conds&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_cond</span><span class="p">(</span><span class="n">condname</span><span class="p">,</span> <span class="o">**</span><span class="n">cond</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">create_cond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condname</span><span class="p">,</span> <span class="n">run</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">audio_env</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                    <span class="n">base_dir</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">nii_files</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;conds&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">condname</span><span class="p">)</span>
+        <span class="n">cond</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;offset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">offset</span>
+        <span class="n">cond</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;max_len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_len</span> <span class="ow">or</span> <span class="bp">False</span>     <span class="c">#can&#39;t store None</span>
+        <span class="n">cond</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold</span>
+        <span class="n">cond</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;prop_pass_thresh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">7</span>
+        <span class="n">cond</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;run&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">run</span> <span class="ow">or</span> <span class="n">condname</span>
+        <span class="n">cond</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;reference&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reference</span>
+        <span class="k">if</span> <span class="n">group</span><span class="p">:</span> <span class="n">cond</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;group&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span>
+        <span class="n">cond</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&#39;blocks&#39;</span><span class="p">)</span>
+        <span class="n">cond</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&#39;correlations&#39;</span><span class="p">)</span>
+        <span class="n">cond</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&#39;analyses&#39;</span><span class="p">)</span>
+        
+        <span class="c">#Load conditions in from config</span>
+        
+        <span class="k">if</span> <span class="n">audio_env</span><span class="p">:</span>
+            <span class="n">aud_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">audio_env</span><span class="p">)</span>
+            <span class="k">print</span> <span class="n">aud_path</span>
+            <span class="n">cond</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s">&#39;audio_env&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">load_nii_or_npy</span><span class="p">(</span><span class="n">aud_path</span><span class="p">))</span>
+        
+        <span class="c">#Don&#39;t attempt to load data when nii_files is blank (dummy cond)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nii_files</span><span class="p">:</span> <span class="k">return</span>
+
+        <span class="c">#Create subject data</span>
+        <span class="n">full_query</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">nii_files</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_subject_files</span><span class="p">(</span><span class="n">full_query</span><span class="p">):</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+            <span class="n">sub_id</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s">&#39;sub_id&#39;</span><span class="p">]</span> <span class="c">#TODO add run_id to mix</span>
+            <span class="k">print</span> <span class="n">fname</span><span class="p">,</span> <span class="n">sub_id</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dry_run</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_subrun</span><span class="p">(</span><span class="n">sub_id</span><span class="p">,</span> <span class="n">condname</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">cond</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+            <span class="c">#have option to do threshold?</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+        <span class="c">#TODO blocks (pandas)</span>
+        <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cond</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span> <span class="k">print</span> <span class="n">k</span><span class="p">,</span> <span class="s">&#39;:</span><span class="se">\t\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">v</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">cond</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">cond</span>
+    
+    <span class="k">def</span> <span class="nf">create_subrun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_id</span><span class="p">,</span> <span class="n">condname</span><span class="p">,</span> <span class="n">fname_or_arr</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">sub_id</span><span class="p">,</span> <span class="n">condname</span><span class="p">)</span>
+        <span class="c">#Remote link if sub_folder is specified</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;sub_folder&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">sub_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;subjects&#39;</span><span class="p">]:</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;sub_folder&#39;</span><span class="p">],</span> <span class="n">sub_id</span><span class="o">+</span><span class="s">&#39;.h5&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_new</span><span class="p">:</span>
+                <span class="n">f_new</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">sub_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;subjects/</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="n">sub_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">ExternalLink</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">sub_id</span><span class="p">)</span>
+
+        <span class="c">#add condition to subject group</span>
+        <span class="n">g_sub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;subjects&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">sub_id</span><span class="p">,</span> <span class="n">condname</span><span class="p">))</span>
+        <span class="n">run</span> <span class="o">=</span> <span class="n">Run</span><span class="p">(</span><span class="n">g_sub</span><span class="p">)</span>
+        <span class="n">run</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">fname_or_arr</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="n">reference</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">run</span>
+
+    <span class="k">def</span> <span class="nf">get_cond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condname</span><span class="p">):</span>
+        <span class="c">#TODO change to getitem method?</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;conds/</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="n">condname</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Exp.iter_runs"><a class="viewcode-back" href="../../api/pycorr.subject.html#pycorr.subject.Exp.iter_runs">[docs]</a>    <span class="k">def</span> <span class="nf">iter_runs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condname</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterate through all subjects and all runs within subject. Yield run with same name as run attr in cond</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters:</span>
+<span class="sd">        condname --  string specifying condition or condition object</span>
+<span class="sd">        group    --  group name that must also match in the group attr for each run</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cond</span><span class="p">(</span><span class="n">condname</span><span class="p">)</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">condname</span><span class="p">,</span> <span class="s">&#39;upper&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">condname</span> <span class="c">#TODO this is hacky</span>
+        <span class="k">for</span> <span class="n">sname</span><span class="p">,</span> <span class="n">sub</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;subjects&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">run_name</span><span class="p">,</span> <span class="n">raw_run</span> <span class="ow">in</span> <span class="n">sub</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="n">run</span> <span class="o">=</span> <span class="n">Run</span><span class="p">(</span><span class="n">raw_run</span><span class="p">)</span>
+                <span class="n">group</span> <span class="o">=</span> <span class="n">group</span> <span class="k">if</span> <span class="n">group</span> <span class="k">else</span> <span class="n">cond</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;group&#39;</span><span class="p">)</span>
+                <span class="n">ingroup</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">group</span> <span class="ow">or</span> <span class="n">run</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;group&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">group</span>  <span class="c">#TODO print warning if no group set for run? need to set group in Run class</span>
+                <span class="k">if</span> <span class="n">run_name</span> <span class="o">==</span> <span class="n">cond</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;run&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">ingroup</span><span class="p">:</span> <span class="k">yield</span> <span class="n">run</span>
+</div>
+    <span class="k">def</span> <span class="nf">N_runs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_runs</span><span class="p">(</span><span class="n">condname</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">gen_composite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condname</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="c">#TODO overwrite</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">standardized</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_runs</span><span class="p">(</span><span class="n">condname</span><span class="p">))</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_runs</span><span class="p">(</span><span class="n">condname</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">composite</span> <span class="o">=</span> <span class="n">sum_tc</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">standardize_out</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cond</span><span class="p">(</span><span class="n">condname</span><span class="p">)</span>
+        <span class="n">dset</span> <span class="o">=</span> <span class="n">cond</span><span class="o">.</span><span class="n">require_dataset</span><span class="p">(</span><span class="s">&#39;composite&#39;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">composite</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">composite</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">dset</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">composite</span>
+
+    <span class="k">def</span> <span class="nf">gen_cond_thresh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condname</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cond</span><span class="p">(</span><span class="n">condname</span><span class="p">)</span>
+        <span class="n">dlist</span> <span class="o">=</span> <span class="p">[</span><span class="o">~</span><span class="n">run</span><span class="o">.</span><span class="n">thresh</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_runs</span><span class="p">(</span><span class="n">condname</span><span class="p">)]</span>              <span class="c">#all that pass threshold</span>
+        <span class="n">thresh_fail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cond_thresh</span><span class="p">(</span><span class="n">dlist</span><span class="p">,</span> <span class="n">cond</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;prop_pass_thresh&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="s">&#39;threshold&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cond</span><span class="p">:</span>
+            <span class="n">cond</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s">&#39;threshold&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">thresh_fail</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">cond</span><span class="p">[</span><span class="s">&#39;threshold&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">thresh_fail</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cond_thresh</span><span class="p">(</span><span class="n">dlist</span><span class="p">,</span> <span class="n">mustpassprop</span><span class="p">):</span>
+        <span class="n">n_must_pass</span> <span class="o">=</span> <span class="p">(</span><span class="n">mustpassprop</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">dlist</span><span class="p">)</span>
+        <span class="n">above_thresh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dlist</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">thresh_fail</span> <span class="o">=</span> <span class="n">above_thresh</span> <span class="o">&lt;</span> <span class="n">n_must_pass</span> 			<span class="c">#sum num of failed subjects per voxel</span>
+        <span class="k">return</span> <span class="n">thresh_fail</span>
+
+    <span class="k">def</span> <span class="nf">summarize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condname</span><span class="p">):</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cond</span><span class="p">(</span><span class="n">condname</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">printvalue</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">print</span> <span class="n">name</span><span class="p">,</span> <span class="s">&#39;:</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">cond</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">cond</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">printvalue</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Exp.get_subject_files"><a class="viewcode-back" href="../../api/pycorr.subject.html#pycorr.subject.Exp.get_subject_files">[docs]</a>    <span class="k">def</span> <span class="nf">get_subject_files</span><span class="p">(</span><span class="n">globpath</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterator. Returns re match object for each matching path.</span>
+<span class="sd">        </span>
+<span class="sd">        Full path accessed using m.group(); args from m.groupdict()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#to_glob = globpath.format(sub_id=&#39;*&#39;)</span>
+        <span class="n">to_glob</span><span class="p">,</span> <span class="n">to_re</span> <span class="o">=</span> <span class="n">query_to_re_groups</span><span class="p">(</span><span class="n">globpath</span><span class="p">)</span>   <span class="c">#for getting sub_id out of results</span>
+        <span class="n">nii_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">to_glob</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">nii_files</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">to_re</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">create_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roiname</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="n">roi_data</span> <span class="o">=</span> <span class="n">load_nii_or_npy</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;rois&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">roiname</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">roi_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">roi</span>
+</div>
+<div class="viewcode-block" id="Cond"><a class="viewcode-back" href="../../api/pycorr.subject.html#pycorr.subject.Cond">[docs]</a><span class="k">class</span> <span class="nc">Cond</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Michael Chow.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

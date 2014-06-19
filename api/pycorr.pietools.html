@@ -1,0 +1,262 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pietools &mdash; pycorr 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pycorr 0.1 documentation" href="../index.html"/>
+        <link rel="up" title="API Reference" href="index.html"/>
+        <link rel="next" title="statistics" href="pycorr.statistics.html"/>
+        <link rel="prev" title="gen_corrmat" href="pycorr.gen_corrmat.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../index.html" class="fa fa-home"> pycorr</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#python">Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#installing-dependencies">Installing Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#installing-pycorr-on-rondo">Installing pycorr on Rondo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#example-pipeline">Example Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pycorr.html"><tt class="docutils literal"><span class="pre">pycorr</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.cli.html"><tt class="docutils literal"><span class="pre">cli</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.funcs_correlate.html"><tt class="docutils literal"><span class="pre">funcs_correlate</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.gen_corrmat.html"><tt class="docutils literal"><span class="pre">gen_corrmat</span></tt></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href=""><tt class="docutils literal"><span class="pre">pietools</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.statistics.html"><tt class="docutils literal"><span class="pre">statistics</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.subject.html"><tt class="docutils literal"><span class="pre">subject</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.workflows.html"><tt class="docutils literal"><span class="pre">workflows</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">pycorr</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+      
+    <li><tt class="docutils literal"><span class="pre">pietools</span></tt></li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="../_sources/api/pycorr.pietools.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="module-pycorr.pietools">
+<span id="pietools"></span><h1><tt class="xref py py-mod docutils literal"><span class="pre">pietools</span></tt><a class="headerlink" href="#module-pycorr.pietools" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pycorr.pietools.arr_slice">
+<tt class="descclassname">pycorr.pietools.</tt><tt class="descname">arr_slice</tt><big>(</big><em>nii_file</em>, <em>_slice</em><big>)</big><a class="reference internal" href="../_modules/pycorr/pietools.html#arr_slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.pietools.arr_slice" title="Permalink to this definition">¶</a></dt>
+<dd><p>slices indx from first dim from matrix, for parallelization</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.pietools.copy_nii_hdr">
+<tt class="descclassname">pycorr.pietools.</tt><tt class="descname">copy_nii_hdr</tt><big>(</big><em>nii</em>, <em>data</em>, <em>save=''</em><big>)</big><a class="reference internal" href="../_modules/pycorr/pietools.html#copy_nii_hdr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.pietools.copy_nii_hdr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a nifti object using another nifti&#8217;s header</p>
+<p>Dimensions are changed to correspond with data shape</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.pietools.is_numeric">
+<tt class="descclassname">pycorr.pietools.</tt><tt class="descname">is_numeric</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../_modules/pycorr/pietools.html#is_numeric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.pietools.is_numeric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks for numeric-like objects.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.pietools.load_nii_or_npy">
+<tt class="descclassname">pycorr.pietools.</tt><tt class="descname">load_nii_or_npy</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../_modules/pycorr/pietools.html#load_nii_or_npy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.pietools.load_nii_or_npy" title="Permalink to this definition">¶</a></dt>
+<dd><p>convenience function to load nib or np filetypes</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.pietools.loadwith">
+<tt class="descclassname">pycorr.pietools.</tt><tt class="descname">loadwith</tt><big>(</big><em>subdir</em>, <em>path</em>, <em>func</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pycorr/pietools.html#loadwith"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.pietools.loadwith" title="Permalink to this definition">¶</a></dt>
+<dd><p>For all subs in basedir, apply func to path, return list.</p>
+<p>Parameteres:
+subdir &#8211;   base directory to iterate through. If none, just glob path.
+path &#8211;     path to search for in each dir in subdir
+func &#8211;     function to apply to each path found</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.pietools.print_Blocks">
+<tt class="descclassname">pycorr.pietools.</tt><tt class="descname">print_Blocks</tt><big>(</big><em>dirname</em><big>)</big><a class="reference internal" href="../_modules/pycorr/pietools.html#print_Blocks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.pietools.print_Blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given subject dir, print number of TRs for each block</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.pietools.query_to_re_groups">
+<tt class="descclassname">pycorr.pietools.</tt><tt class="descname">query_to_re_groups</tt><big>(</big><em>query</em><big>)</big><a class="reference internal" href="../_modules/pycorr/pietools.html#query_to_re_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.pietools.query_to_re_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a string with with glob syntax, allow for named groups for wildcards</p>
+<dl class="docutils">
+<dt>E.g. &#8220;<a href="#id1"><span class="problematic" id="id2">*</span></a>/{sub_id}/file.txt&#8221; is converted to a regular expression where {sub_id} is a wildcard,</dt>
+<dd>and it&#8217;s match is a group named sub_id.</dd>
+</dl>
+<p>Supports multiple {bracketed_args}</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.pietools.searchr">
+<tt class="descclassname">pycorr.pietools.</tt><tt class="descname">searchr</tt><big>(</big><em>dirname</em>, <em>matchme</em>, <em>verbose=True</em><big>)</big><a class="reference internal" href="../_modules/pycorr/pietools.html#searchr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.pietools.searchr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Walk dir, return list of all matches.  Use glob to match.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.pietools.sort_int_folder">
+<tt class="descclassname">pycorr.pietools.</tt><tt class="descname">sort_int_folder</tt><big>(</big><em>files</em><big>)</big><a class="reference internal" href="../_modules/pycorr/pietools.html#sort_int_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.pietools.sort_int_folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort a folder with files of form {INT}.ext into ascending, numeric order</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.pietools.subs_getfile">
+<tt class="descclassname">pycorr.pietools.</tt><tt class="descname">subs_getfile</tt><big>(</big><em>dirname</em>, <em>matchme</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="../_modules/pycorr/pietools.html#subs_getfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.pietools.subs_getfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively find all matching files, return as dictionary with entry for each subdir</p>
+<p>Parameters:
+dirname &#8211; directory to search
+matchme &#8211; string to match.  May use wildcards (glob used)</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pycorr.statistics.html" class="btn btn-neutral float-right" title="statistics"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pycorr.gen_corrmat.html" class="btn btn-neutral" title="gen_corrmat"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Michael Chow.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

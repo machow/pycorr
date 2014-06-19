@@ -1,0 +1,372 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>funcs_correlate &mdash; pycorr 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pycorr 0.1 documentation" href="../index.html"/>
+        <link rel="up" title="API Reference" href="index.html"/>
+        <link rel="next" title="gen_corrmat" href="pycorr.gen_corrmat.html"/>
+        <link rel="prev" title="cli" href="pycorr.cli.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../index.html" class="fa fa-home"> pycorr</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#python">Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#installing-dependencies">Installing Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#installing-pycorr-on-rondo">Installing pycorr on Rondo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#example-pipeline">Example Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pycorr.html"><tt class="docutils literal"><span class="pre">pycorr</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.cli.html"><tt class="docutils literal"><span class="pre">cli</span></tt></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href=""><tt class="docutils literal"><span class="pre">funcs_correlate</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.gen_corrmat.html"><tt class="docutils literal"><span class="pre">gen_corrmat</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.pietools.html"><tt class="docutils literal"><span class="pre">pietools</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.statistics.html"><tt class="docutils literal"><span class="pre">statistics</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.subject.html"><tt class="docutils literal"><span class="pre">subject</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycorr.workflows.html"><tt class="docutils literal"><span class="pre">workflows</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">pycorr</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+      
+    <li><tt class="docutils literal"><span class="pre">funcs_correlate</span></tt></li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="../_sources/api/pycorr.funcs_correlate.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="module-pycorr.funcs_correlate">
+<span id="funcs-correlate"></span><h1><tt class="xref py py-mod docutils literal"><span class="pre">funcs_correlate</span></tt><a class="headerlink" href="#module-pycorr.funcs_correlate" title="Permalink to this headline">¶</a></h1>
+<p>Functions for loading, standardizing, and calculating correlations (including lagged)</p>
+<blockquote>
+<div>M Chow, Oct 2012
+<a class="reference external" href="mailto:machow&#37;&#52;&#48;princeton&#46;edu">machow<span>&#64;</span>princeton<span>&#46;</span>edu</a></div></blockquote>
+<dl class="function">
+<dt id="pycorr.funcs_correlate.corcomposite">
+<tt class="descclassname">pycorr.funcs_correlate.</tt><tt class="descname">corcomposite</tt><big>(</big><em>sub</em>, <em>dsummed</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pycorr/funcs_correlate.html#corcomposite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.funcs_correlate.corcomposite" title="Permalink to this definition">¶</a></dt>
+<dd><p>corsubs convenience function for correlating subject with a composite it is part of</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.funcs_correlate.corsubs">
+<tt class="descclassname">pycorr.funcs_correlate.</tt><tt class="descname">corsubs</tt><big>(</big><em>A</em>, <em>B</em>, <em>axis=-1</em>, <em>standardized=False</em><big>)</big><a class="reference internal" href="../_modules/pycorr/funcs_correlate.html#corsubs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.funcs_correlate.corsubs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return correlation mat of time series along specified axis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>A</strong> (<em>ndarray</em>) &#8211; array of arbitrary dimension</li>
+<li><strong>B</strong> (<em>ndarray</em>) &#8211; array with dim(B) == dim(A)</li>
+<li><strong>axis</strong> (<em>int</em>) &#8211; along which to correlate</li>
+<li><strong>standardized</strong> (<em>bool</em>) &#8211; specify if sequences are already demeaned, with variance of one</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Correlation matrix with dim(A), except for the axis used for correlating.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>TODO: generalize axis argument</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.funcs_correlate.crosscor">
+<tt class="descclassname">pycorr.funcs_correlate.</tt><tt class="descname">crosscor</tt><big>(</big><em>dlist</em>, <em>B=None</em>, <em>standardized=True</em><big>)</big><a class="reference internal" href="../_modules/pycorr/funcs_correlate.html#crosscor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.funcs_correlate.crosscor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes list of subject data, returns matrix of correlation matrices at each voxel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dlist</strong> &#8211; list of arrays to correlate along last dimension (must be equal shape)</li>
+<li><strong>B</strong> &#8211; optionally calculate the cross-correlation matrix with arrays in B</li>
+<li><strong>standardized</strong> &#8211; whether all data are standardized (speeds calculation)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.funcs_correlate.intersubcorr">
+<tt class="descclassname">pycorr.funcs_correlate.</tt><tt class="descname">intersubcorr</tt><big>(</big><em>C_all</em>, <em>excludeself=True</em><big>)</big><a class="reference internal" href="../_modules/pycorr/funcs_correlate.html#intersubcorr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.funcs_correlate.intersubcorr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of intersubj correlations.  Last two dims must be the cov matrix.</p>
+<p>This function uses that the var( sum of R.V.&#8217;s ) is the sum of their cov matrix.  If entire row / col
+is NaN, then returns ISC as if that subject was removed (to allow dropping voxels with mean activity &lt; 6000.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>C_all</strong> &#8211; ndarray with correlation matrix on last two dims</li>
+<li><strong>excludeself</strong> &#8211; remove participant from ISC calculation</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.funcs_correlate.lagcor">
+<tt class="descclassname">pycorr.funcs_correlate.</tt><tt class="descname">lagcor</tt><big>(</big><em>A</em>, <em>B</em>, <em>h</em>, <em>axis=-1</em>, <em>standardized=False</em>, <em>offset=0</em><big>)</big><a class="reference internal" href="../_modules/pycorr/funcs_correlate.html#lagcor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.funcs_correlate.lagcor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the corr of A_t+h with B_t.  If dim length differs, cut from end.</p>
+<p>Parameters:
+A:            n-dim array with time as final dim
+B:            same shape array
+axis:         time axis (passed to corsubs)
+standardized: already demained, and var == one? (passed to corsubs)
+offset:       is offset number of timepoints passed B</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.funcs_correlate.load_roi">
+<tt class="descclassname">pycorr.funcs_correlate.</tt><tt class="descname">load_roi</tt><big>(</big><em>nii</em>, <em>thresh=6000</em>, <em>standardize=True</em>, <em>outlen=None</em>, <em>padding=&lt;function mean at 0x1048da7d0&gt;</em>, <em>meantc=False</em><big>)</big><a class="reference internal" href="../_modules/pycorr/funcs_correlate.html#load_roi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.funcs_correlate.load_roi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a nifti file and apply several functions to it.</p>
+<p>nii &#8211; name of nifti to load or ndarray
+standardize &#8211; return all tcs with mean = 0 and stdev = 1
+outlen &#8211; specify how long resultant tcs should be, pad if necessary
+padding &#8211; function to apply to ndarray, must take axis=-1 argument
+meantc &#8211; return the meantc over all voxels (before evaluating standardize)</p>
+<p>TODO: fix default outlen arg</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.funcs_correlate.roimask">
+<tt class="descclassname">pycorr.funcs_correlate.</tt><tt class="descname">roimask</tt><big>(</big><em>data</em>, <em>roi</em>, <em>filter_func=None</em>, <em>proc_func=None</em>, <em>mean_ts=False</em><big>)</big><a class="reference internal" href="../_modules/pycorr/funcs_correlate.html#roimask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.funcs_correlate.roimask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mask data using values in roi &gt; 0</p>
+<p>Parameters:
+data &#8211; numpy array to be masked
+roi &#8211; array to be checked for nonzero values
+filter_func &#8211; function to further subset roi (e.g. remove time courses with mean &lt; 6000)
+proc_func &#8211; TODO</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.funcs_correlate.shift">
+<tt class="descclassname">pycorr.funcs_correlate.</tt><tt class="descname">shift</tt><big>(</big><em>A</em>, <em>h</em>, <em>outlen=None</em>, <em>offset=0</em><big>)</big><a class="reference internal" href="../_modules/pycorr/funcs_correlate.html#shift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.funcs_correlate.shift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shifts entire time series by h. If h is negative, pad beginning with NaN</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.funcs_correlate.standardize">
+<tt class="descclassname">pycorr.funcs_correlate.</tt><tt class="descname">standardize</tt><big>(</big><em>A</em>, <em>axis=-1</em>, <em>demean=True</em>, <em>devar=True</em>, <em>inplace=False</em><big>)</big><a class="reference internal" href="../_modules/pycorr/funcs_correlate.html#standardize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.funcs_correlate.standardize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subtract mean, divide standard deviation (z-scoring).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>A</strong> (<em>ndarray</em>) &#8211; data to standardize.</li>
+<li><strong>axis</strong> (<em>int</em>) &#8211; axis along which to standardize.</li>
+<li><strong>demean</strong> (<em>bool</em>) &#8211; make mean equal to zero.</li>
+<li><strong>devar</strong> (<em>bool</em>) &#8211; make variance equal to one.</li>
+<li><strong>inplace</strong> (<em>bool</em>) &#8211; operate in-place (and return reference)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Returns: standardized copy or reference of A</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">NaNs should be taken care of prior to using this function,
+as they will propogate.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.funcs_correlate.sum_tc">
+<tt class="descclassname">pycorr.funcs_correlate.</tt><tt class="descname">sum_tc</tt><big>(</big><em>dlist</em>, <em>nans=True</em>, <em>standardize_subs=False</em>, <em>standardize_out=False</em>, <em>shape=None</em><big>)</big><a class="reference internal" href="../_modules/pycorr/funcs_correlate.html#sum_tc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.funcs_correlate.sum_tc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the sum of all timecourses in dlist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dlist</strong> &#8211; list or generator of arrays to sum</li>
+<li><strong>nans</strong> (<em>bool</em>) &#8211; set NaN to 0 when summing</li>
+<li><strong>standardize_subs</strong> (<em>bool</em>) &#8211; standardize before summing</li>
+<li><strong>standardize_out</strong> (<em>bool</em>) &#8211; standardize output</li>
+<li><strong>shape</strong> (<em>list</em>) &#8211; shape (necessary if using generator)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>TODO: what is the point of the nans option?</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycorr.funcs_correlate.trim">
+<tt class="descclassname">pycorr.funcs_correlate.</tt><tt class="descname">trim</tt><big>(</big><em>A</em>, <em>ends=(0</em>, <em>0)</em>, <em>h=None</em><big>)</big><a class="reference internal" href="../_modules/pycorr/funcs_correlate.html#trim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycorr.funcs_correlate.trim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns Array with last dim trimmed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>A</strong> &#8211; n-dim array</li>
+<li><strong>ends</strong> &#8211; how much trim from each end, e.g. (10, -10)</li>
+<li><strong>h</strong> &#8211; specify how much to trim from one side. Overrides that argument in ends.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>TODO: h is a weird option (and you never use it)</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pycorr.gen_corrmat.html" class="btn btn-neutral float-right" title="gen_corrmat"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pycorr.cli.html" class="btn btn-neutral" title="cli"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Michael Chow.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
