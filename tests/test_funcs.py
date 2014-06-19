@@ -6,7 +6,7 @@
 from nose import with_setup
 import numpy as np
 from numpy.testing import assert_almost_equal
-from pieman.funcs_correlate import standardize, corsubs, crosscor, intersubcorr
+from pycorr.funcs_correlate import standardize, corsubs, crosscor, intersubcorr
 
 np.random.seed(10)
 

@@ -5,8 +5,8 @@ import shutil
 import sys; sys.path.append('../..')
 
 import h5py, yaml
-from pieman import subject
-from pieman.workflows import isc_within
+from pycorr import subject
+from pycorr.workflows import isc_within
 import numpy as np
 
 class test_fullpipe(object):
@@ -69,7 +69,7 @@ class test_fullpipe(object):
         for ii, _ in enumerate(sol):
             print ii
             subprocess.call('python %s -t -x %s -o test_out --n_reps 10'%(perm_fname, ii), shell=True) #run analysis
-        subprocess.call('python pieman/cli/splice_dir.py -s test_out/isc_corrmat', shell=True)                        #splice back together
+        subprocess.call('python pycorr/cli/splice_dir.py -s test_out/isc_corrmat', shell=True)                        #splice back together
         C = np.load('test_out/isc_corrmat.npy')
         indx_A = range(3)
         assert np.allclose(C[..., indx_A,:][...,:,indx_A], sol)
@@ -89,7 +89,7 @@ class test_fullpipe(object):
         for ii, _ in enumerate(sol):
             print ii
             subprocess.call('python %s --hdf5 test.h5 -a test_cond -x %s -o test_out --isc_only'%(perm_fname, ii), shell=True) #run analysis
-        subprocess.call('python pieman/cli/splice_dir.py -s test_out/isc_corrmat', shell=True)                        #splice back together
+        subprocess.call('python pycorr/cli/splice_dir.py -s test_out/isc_corrmat', shell=True)                        #splice back together
         C = np.load('test_out/isc_corrmat.npy')
         indx_A = range(3)
         assert np.allclose(C[..., indx_A,:][...,:,indx_A], sol)

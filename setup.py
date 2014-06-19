@@ -9,11 +9,11 @@ if len(sys.argv) > 1 and sys.argv[1] == 'test':
         shutil.copytree(os.path.join(basedir, 'tests/data/fullpipe'), 'pipeline')
     except: print "can't find test data..."
     shutil.copy2(os.path.join(basedir, 'tests/run_pipe.py'), 'run.py')
-    os.symlink(basedir, 'pieman')
+    os.symlink(basedir, 'pycorr')
     
     import numpy as np
     sys.path.append(os.path.join(basedir, '..'))
-    from pieman.tests.gen_corrmat import fourD, fourD_sol
+    from pycorr.tests.gen_corrmat import fourD, fourD_sol
     mkdir_p('pipeline/subjects')
     for ii, sub in enumerate(fourD):
         np.save('pipeline/subjects/test_sub%s.npy'%ii, sub + 7000)

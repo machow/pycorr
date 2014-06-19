@@ -3,9 +3,9 @@ if os.path.isfile('test.h5'): os.remove('test.h5')
 
 import h5py, yaml
 import numpy as np
-from pieman.funcs_correlate import lagcor
-from pieman.workflows import isc_within, isc_between
-import pieman.subject as subject
+from pycorr.funcs_correlate import lagcor
+from pycorr.workflows import isc_within, isc_between
+import pycorr.subject as subject
 
 # Setup ---------------------------------------------------
 

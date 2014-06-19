@@ -9,8 +9,8 @@ import sys
 basedir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(basedir + '/../..'))
 
-from pieman.subject import Exp
-from pieman.pietools import mkdir_p
+from pycorr.subject import Exp
+from pycorr.pietools import mkdir_p
 import pandas as pd
 import argparse
 

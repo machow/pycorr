@@ -45,7 +45,7 @@ for lam in corrs:
     out.append(data)
 data
 
-from pieman.funcs_correlate import crosscor
+from pycorr.funcs_correlate import crosscor
 out = np.array(out).transpose([2,0,1])
 out_sol = crosscor(out, standardized=False)
 np.allclose(out_sol, np.array(sol))

@@ -1,5 +1,5 @@
 import numpy as np
-from pieman.funcs_correlate import standardize, corsubs, lagcor, sum_tc, shift, trim
+from pycorr.funcs_correlate import standardize, corsubs, lagcor, sum_tc, shift, trim
 from numpy.testing import assert_almost_equal
 import os
 

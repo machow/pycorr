@@ -16,10 +16,10 @@ import os, sys, argparse
 basedir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(basedir + '/../..'))
 import numpy as np
-from pieman.funcs_correlate import crosscor, intersubcorr
-from pieman.statistics import perm, isc_corrmat_within_diff
-from pieman.subject import Run, Exp
-from pieman.pietools import mkdir_p, parse_section, arr_slice
+from pycorr.funcs_correlate import crosscor, intersubcorr
+from pycorr.statistics import perm, isc_corrmat_within_diff
+from pycorr.subject import Run, Exp
+from pycorr.pietools import mkdir_p, parse_section, arr_slice
 
 # ARG PARSING
 parser = argparse.ArgumentParser(description= __doc__)
@@ -48,7 +48,7 @@ mask = np.load(args.mask) if args.mask else slice(None)
 if not args.hdf5:
     # LOAD FILES
     if args.t:                     #TESTING FLAG 
-        from pieman.tests.gen_corrmat import fourD
+        from pycorr.tests.gen_corrmat import fourD
         A_files = fourD + 7000
         B_files = fourD + 7000
     elif args.a and args.b:    

@@ -1,7 +1,7 @@
 import sys, os
 basedir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(basedir + '/../..'))
-from pieman.pietools import splice_dir, copy_nii_hdr, load_nii_or_npy
+from pycorr.pietools import splice_dir, copy_nii_hdr, load_nii_or_npy
 import numpy as np
 import argparse
 
