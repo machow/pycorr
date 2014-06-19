@@ -154,6 +154,7 @@ doctest:
 
 gh-pages:
 	git checkout gh-pages
+	cd ..
 	rm -rf *
 	git checkout pack2 docs
 	git reset HEAD
