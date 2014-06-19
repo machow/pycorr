@@ -1,8 +1,10 @@
-#   Functions for loading, standardizing, and calculating correlations (including lagged)
-#
-#   M Chow, Oct 2012
-#   machow@princeton.edu
-#
+"""
+Functions for loading, standardizing, and calculating correlations (including lagged)
+
+   M Chow, Oct 2012
+   machow@princeton.edu
+
+"""
 
 import numpy as np
 import nibabel as nib
@@ -10,7 +12,21 @@ from itertools import combinations, product
 from scipy.stats.stats import nanmean
 
 def standardize(A, axis = -1, demean = True, devar = True, inplace=False):
-    """Subtract mean, divide standard deviation (z-scoring).  Operate in-place.
+    """Subtract mean, divide standard deviation (z-scoring).
+
+    Parameters:
+        A       (ndarray) : data to standardize.
+        axis    (int)     : axis along which to standardize.
+        demean  (bool)    : make mean equal to zero.
+        devar   (bool)    : make variance equal to one. 
+        inplace (bool)    : operate in-place (and return reference)
+
+    Returns: standardized copy or reference of A
+
+    Note:
+        NaNs should be taken care of prior to using this function,
+        as they will propogate.
+
     """
     m  = np.expand_dims(np.mean(A, axis),         axis)
     sd = np.expand_dims( np.std(A, axis, ddof=1), axis)
@@ -25,13 +41,17 @@ def standardize(A, axis = -1, demean = True, devar = True, inplace=False):
     return A
 
 
-
 def corsubs(A, B, axis = -1, standardized = False):
     """Return correlation mat of time series along specified axis.
 
     Parameters:
-    axis - along which to correlate
-    standardized - specify if sequences are already demeaned, with variance of one
+        A        (ndarray) : array of arbitrary dimension
+        B        (ndarray) : array with dim(B) == dim(A)
+        axis         (int) : along which to correlate
+        standardized (bool): specify if sequences are already demeaned, with variance of one
+
+    Returns:
+        Correlation matrix with dim(A), except for the axis used for correlating.
 
     TODO: generalize axis argument
 
@@ -44,11 +64,22 @@ def corsubs(A, B, axis = -1, standardized = False):
         return np.sum(demean(A) * demean(B), axis) / (std(A)*std(B) * n_df)
 
 def corcomposite(sub, dsummed, **kwargs):
-    """Convenience function for correlating subject with a composite it is part of"""
+    """corsubs convenience function for correlating subject with a composite it is part of"""
     return corsubs(sub, dsummed-sub, **kwargs)
 
+
 def sum_tc(dlist, nans = True, standardize_subs=False, standardize_out=False, shape=None):
-    """Returns new timecourse from sum of all timecourses.""" 
+    """Returns the sum of all timecourses in dlist.
+
+    Parameters:
+        dlist      :             list or generator of arrays to sum   
+        nans (bool):             set NaN to 0 when summing    
+        standardize_subs (bool): standardize before summing
+        standardize_out  (bool): standardize output
+        shape (list):            shape (necessary if using generator)
+ 
+    TODO: what is the point of the nans option?
+    """ 
     newA = np.zeros(shape or dlist[0].shape)
     if standardize_subs: 
         dlist = (standardize(sub, inplace=False) for sub in dlist)
@@ -62,15 +93,16 @@ def sum_tc(dlist, nans = True, standardize_subs=False, standardize_out=False, sh
     if standardize_out: standardize(newA, inplace=True)
     return newA
 
+
 def intersubcorr(C_all, excludeself = True):
-    """
-    Returns an array of intersubj correlations.  Last two dims must be the cov matrix.
+    """ Returns an array of intersubj correlations.  Last two dims must be the cov matrix.
 
     This function uses that the var( sum of R.V.'s ) is the sum of their cov matrix.  If entire row / col
     is NaN, then returns ISC as if that subject was removed (to allow dropping voxels with mean activity < 6000.
 
     Parameters:
-    excludeself -- is diagonal corr(x_i, x_i)?  remove from calculation?
+        C_all      : ndarray with correlation matrix on last two dims
+        excludeself: remove participant from ISC calculation
 
     """
     covttl = np.apply_over_axes(np.nansum, C_all, [-1,-2]).reshape(C_all.shape[:-2])
@@ -83,7 +115,14 @@ def intersubcorr(C_all, excludeself = True):
 
 
 def crosscor(dlist, B=None, standardized = True):
-    """Takes list of subject data, returns matrix of correlation matrices at each voxel."""
+    """Takes list of subject data, returns matrix of correlation matrices at each voxel.
+
+    Parameters:
+        dlist: list of arrays to correlate along last dimension (must be equal shape)
+        B    : optionally calculate the cross-correlation matrix with arrays in B
+        standardized: whether all data are standardized (speeds calculation)
+    
+    """
     if not np.any(B):
         N = len(dlist)
         dims = list(dlist[0].shape[:-1]) + [N,N]   #collapsed across time, expanded #subs x #subs
@@ -105,17 +144,15 @@ def crosscor(dlist, B=None, standardized = True):
         return C_all
 
 
-
-
 def lagcor(A, B, h, axis=-1, standardized=False, offset=0):
     """Return the corr of A_t+h with B_t.  If dim length differs, cut from end.
 
     Parameters:
-    A -- n-dim array with time as final dim
-    B -- same shape array
-    axis -- time axis (passed to corsubs)
-    standardized -- already demained, and var == one? (passed to corsubs)
-    offset -- A is offset number of timepoints passed B
+    A:            n-dim array with time as final dim
+    B:            same shape array
+    axis:         time axis (passed to corsubs)
+    standardized: already demained, and var == one? (passed to corsubs)
+    offset:       is offset number of timepoints passed B
 
     """
 
@@ -135,17 +172,20 @@ def trim(A, ends=(0, 0), h=None):
     """Returns Array with last dim trimmed
 
     Parameters:
-    A -- n-dim array
-    ends -- how much trim from each end, e.g. (10, -10)
-    h -- specify how much to trim from one side. Overrides that argument in ends.
+        A   : n-dim array
+        ends: how much trim from each end, e.g. (10, -10)
+        h   : specify how much to trim from one side. Overrides that argument in ends.
+
+    TODO: h is a weird option (and you never use it)
 
     """
     ends = list(ends)
     ends[h < 0] = h
     return A[..., ends[0] : ends[1] or None]
 
+
 def shift(A, h, outlen=None, offset=0):             #TODO remove offset arg?
-    """Shifts entire time series by h"""
+    """Shifts entire time series by h. If h is negative, pad beginning with NaN"""
     h -= offset
     if h < 0: 
         #raise BaseException('after adjusting for offset, h is negative.  Cannot keep outlen.')
