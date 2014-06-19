@@ -12,7 +12,7 @@
 # serve to show the default.
 
 import sys, os
-sys.path.append('..')
+sys.path.append(os.path.abspath('..'))
 
 
 
