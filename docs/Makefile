@@ -154,10 +154,10 @@ doctest:
 
 gh-pages:
 	git checkout gh-pages
-	rm -rf build sources
+	mv * backup
 	git checkout packaging $(GH_PAGES_SOURCES)
 	git reset HEAD
 	make html
 	mv -fv build/html/* ./
 	rm -rf $(GH_PAGES_SOURCES) build
-	git add -A
+	git add -A ./
