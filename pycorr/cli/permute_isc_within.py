@@ -48,7 +48,7 @@ mask = np.load(args.mask) if args.mask else slice(None)
 if not args.hdf5:
     # LOAD FILES
     if args.t:                     #TESTING FLAG 
-        from pycorr.tests.gen_corrmat import fourD
+        from pycorr.gen_corrmat import fourD
         A_files = fourD + 7000
         B_files = fourD + 7000
     elif args.a and args.b:    

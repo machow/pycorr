@@ -1,4 +1,4 @@
-from pycorr.tests.gen_corrmat import corr_eig
+from gen_corrmat import corr_eig
 from pycorr.statistics import isc_within_diff, isc_corrmat_within_diff, perm
 import numpy as np
 

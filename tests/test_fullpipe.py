@@ -15,7 +15,7 @@ class test_fullpipe(object):
         self.orig_path = os.getcwd()
         self.tmpdir = tempfile.mkdtemp()
         setup_fname = os.path.abspath('setup.py')
-        self.perm_fname = os.path.abspath('cli/permute_isc_within.py')
+        self.perm_fname = os.path.abspath('pycorr/cli/permute_isc_within.py')
 
         os.chdir(self.tmpdir)
         subprocess.call(['python', setup_fname, 'test'])
