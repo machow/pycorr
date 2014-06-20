@@ -108,7 +108,13 @@ if not on_rtd:
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_context = {
+        'display_github': True,
+        'github_user': 'machow', 
+        'github_repo': 'pycorr',
+        'github_version': 'packaging',
+        'conf_py_path':'/docs/source/'
+        }
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
