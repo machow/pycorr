@@ -12,7 +12,8 @@
 # serve to show the default.
 
 import sys, os
-sys.path.append('..')
+sys.path.append(os.path.abspath('..'))
+sys.path.append(os.path.abspath('../..'))
 
 
 
@@ -24,7 +25,7 @@ sys.path.append('..')
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-#needs_sphinx = '1.0'
+needs_sphinx = '1.2'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -107,7 +108,13 @@ if not on_rtd:
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_context = {
+        'display_github': True,
+        'github_user': 'machow', 
+        'github_repo': 'pycorr',
+        'github_version': 'packaging',
+        'conf_py_path':'/docs/source/'
+        }
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
