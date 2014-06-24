@@ -9,7 +9,7 @@ def isc_within_diff(A, B, standardized=False):
     than isc_corrmat_within_diff. Inputs may be multi-dimensional.
     The last dimension is used for correlations (e.g. time should be last).
 
-    Args:
+    Arguments:
         A (list): List of timecourse data for each member of group A.
         B (list): Timecourses of same length as A.
 
