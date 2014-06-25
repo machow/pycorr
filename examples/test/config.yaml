@@ -1,6 +1,6 @@
 #
 #GENERAL SETTINGS
-roi_files: "pipeline/rois/{roi_id}.nii*"
+#roi_files: "pipeline/rois/{roi_id}.nii*"
 sub_folder: subjects
 
 #GROUP SETTINGS

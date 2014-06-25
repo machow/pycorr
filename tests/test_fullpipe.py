@@ -10,7 +10,7 @@ from pycorr.workflows import isc_within
 import numpy as np
 
 class test_fullpipe(object):
-    config = yaml.load(open('config.yaml'))
+    config = yaml.load(open('examples/test/config.yaml'))
     def setup(self):
         self.orig_path = os.getcwd()
         self.tmpdir = tempfile.mkdtemp()
