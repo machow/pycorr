@@ -66,7 +66,6 @@ class Run:
             subset = np.load(sub_path) if type(sub_path) is str else sub_path
         else:
             subset = slice(None)           #to preserve array shapes when subsetting
-        print subset
 
         # ROI 
         if np.any(roi):
