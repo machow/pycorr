@@ -12,8 +12,16 @@ if len(sys.argv) > 1:
     os.symlink(join(basedir, 'pycorr'), 'pycorr')
 
     if example_dir == 'full': 
-        shutil.copytree(join(basedir, example_dir, 'pipeline'), 'pipeline')
-    
+        print "setting up full example (using nifti files and ROIS)"
+        import urllib, zipfile
+        print "downloading data"
+        datfile = 'pycorr_full_data.zip'
+        datpath = os.path.join(basedir, 'examples', example_dir, datfile)
+        # Get zipped data if needed, unzip in example folder
+        if not os.path.isfile(datpath): 
+            urllib.urlretrieve('http://princeton.edu/~machow/pycorr_full_data.zip', datpath)
+        zipfile.ZipFile(open(datpath, 'rb')).extractall()
+
     elif example_dir == 'test':
         import numpy as np
         from pycorr.gen_corrmat import fourD, fourD_sol
