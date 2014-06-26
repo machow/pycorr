@@ -97,6 +97,8 @@ To start the pipeline, enter ``python run.py`` in the console.
 The starter script, ``run.py``, iterates over conditions and performs
 alignment, thresholding, makes a composite, and performs inter-subject correlation.
  
+Navigating Results
+------------------
 
 .. _Yaml: http://www.yaml.org/start.html
 
