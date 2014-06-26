@@ -7,7 +7,12 @@ All dependencies are listed in ``requirements.txt``.
 It's a good idea to install everything into a `virtual environment`_, but feel free to be young and reckless :O.
 Alternatively, the `Anaconda python distribution`_ contains all the necessary packages, except for `nibabel`_, which can be installed using ``pip install nibabel``.
 
-Installing pycorr on Rondo
+Installing Pycorr
+-----------------
+cd to the directory with pycorr, then ``python setup.py install``.
+Since the package is still somewhat of a moving target, you might want to symlink it by using ``python setup.py develop``.
+
+Using pycorr on Rondo
 --------------------------
 
 pycorr is already installed in a virtual environment in the Hasson lab fileshare.

@@ -1,6 +1,9 @@
-.. AUTO-GENERATED FILE -- DO NOT EDIT!
-
 :mod:`subject`
 ==============
-.. automodule:: pycorr.subject
+
+.. autoclass:: pycorr.subject.Run
     :members:
+
+.. autoclass:: pycorr.subject.Exp
+    :members:
+

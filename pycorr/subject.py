@@ -178,6 +178,9 @@ class Exp:
         return self.f['conds'][x]
 
     def setup(self, config, create_conds=False):
+        """Create general structure and load in data.
+
+        """
         #if 'data_storage' in config:
         #    for k,v in config['data_storage'].iteritems():
         #        self.f.attrs[k] = v
@@ -203,6 +206,14 @@ class Exp:
 
     def create_cond(self, condname, run=None, group=None, offset=0, max_len=False, threshold=0, audio_env=None, 
                     base_dir="", nii_files=None, dry_run=False, reference=False, **kwargs):
+        """Create condition.
+
+        Generally used by passing cond params from setup, but can be called manually.
+        All parameters set as default for each run in the condition.
+
+        Parameters:
+            reference: should the data be copied in, or use a reference to data instead?
+        """
         cond = self.f['conds'].create_group(condname)
         cond.attrs['offset'] = offset
         cond.attrs['max_len'] = max_len or False     #can't store None
@@ -242,6 +253,9 @@ class Exp:
         return cond
     
     def create_subrun(self, sub_id, condname, fname_or_arr, reference=False, **kwargs):
+        """Creates subject group for storing individual runs.
+
+        """
         path = '%s/%s'%(sub_id, condname)
         #Remote link if sub_folder is specified
         if self.f.attrs['sub_folder'] and not sub_id in self.f['subjects']:
@@ -280,6 +294,8 @@ class Exp:
         return len(list(self.iter_runs(condname)))
 
     def gen_composite(self, condname, overwrite=False):
+        """Create linear composite for condition.
+        """
         #TODO overwrite
         data = (run.load(standardized=True, threshold=True) for run in self.iter_runs(condname))
         shape = self.iter_runs(condname).next().load().shape
@@ -289,6 +305,8 @@ class Exp:
         dset[...] = composite
 
     def gen_cond_thresh(self, condname, overwrite=False):
+        """Create a group thresholding mask.
+        """
         cond = self.get_cond(condname)
         dlist = [~run.thresh[...] for run in self.iter_runs(condname)]              #all that pass threshold
         thresh_fail = self.cond_thresh(dlist, cond.attrs['prop_pass_thresh'])
@@ -300,6 +318,8 @@ class Exp:
 
     @staticmethod
     def cond_thresh(dlist, mustpassprop):
+        """For each voxel, determine whether enough subs have high enough mean activation.
+        """
         n_must_pass = (mustpassprop) * len(dlist)
         above_thresh = np.sum(dlist, axis=0)
         thresh_fail = above_thresh < n_must_pass 			#sum num of failed subjects per voxel
@@ -325,6 +345,7 @@ class Exp:
             yield re.match(to_re, fname)
 
     def create_roi(self, roiname, fname):
+        """Add new roi to hdf5 in /rois group"""
         roi_data = load_nii_or_npy(fname)
         roi = self.f['rois'].create_dataset(roiname, data=roi_data.astype(bool))
         return roi
