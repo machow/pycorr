@@ -59,13 +59,16 @@
         
             <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#python">Python</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html#installing-dependencies">Installing Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#installing-pycorr-on-rondo">Installing pycorr on Rondo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#installing-pycorr">Installing Pycorr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#using-pycorr-on-rondo">Using pycorr on Rondo</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#example-pipeline">Example Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-pipeline-directory">Setting up Pipeline Directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-data-structure">Example Data Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#config-file">Config file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-pipeline">Running Pipeline</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
@@ -115,9 +118,106 @@
             
   <div class="section" id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
-<p>This is the tutorial page</p>
-<div class="section" id="example-pipeline">
-<h2>Example Pipeline<a class="headerlink" href="#example-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial will take you through how to setup and run a full pipeline.</p>
+<div class="section" id="setting-up-pipeline-directory">
+<h2>Setting up Pipeline Directory<a class="headerlink" href="#setting-up-pipeline-directory" title="Permalink to this headline">¶</a></h2>
+<p>Make a new directory for your pipeline, then run <tt class="docutils literal"><span class="pre">python</span> <span class="pre">$PATH_TO_PYCORR/setup_example.py</span> <span class="pre">full</span></tt>.
+This will install the following in the current directory:</p>
+<ol class="arabic simple">
+<li>config.yaml</li>
+<li>run.py</li>
+<li>pycorr_full_data</li>
+</ol>
+</div>
+<div class="section" id="example-data-structure">
+<h2>Example Data Structure<a class="headerlink" href="#example-data-structure" title="Permalink to this headline">¶</a></h2>
+<p>The example data is contained in <tt class="docutils literal"><span class="pre">pycorr_full_data</span></tt>.
+Looking at how this directory is set up will give a sense for how the config file works.
+The directory should look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre>├── rois
+│   ├── BHipp_3mm_thr30.nii.gz
+│   ├── ...
+│   └── precun_3mm_thr50.nii.gz
+└── subjects
+    ├── OG_062312
+    │   ├── intact
+    │   │   └── trans_filtered_func_data.nii.gz
+    │   ├── mini_wordscram
+    │   │   └── trans_filtered_func_data.nii.gz
+    │   ├── short_wordscram
+    │   │   └── trans_filtered_func_data.nii.gz
+    │   └── wordscram
+    │       └── trans_filtered_func_data.nii.gz
+    ├── ...
+    │   ├── ...
+    │   │   └── ...
+    ├── aud_env_wordscram.npy
+    ├── pieman_intact_audenv.mat
+    └── pieman_wordscram_audenv.mat
+</pre></div>
+</div>
+<p>With a little bit of squinting, it&#8217;s clear the structure is:</p>
+<div class="highlight-python"><div class="highlight"><pre>├── rois
+│   └── {roi_id}
+└── subjects
+    ├── {sub_id}
+    │   ├── runA
+    │   │   └── trans_filtered_func_data.nii.gz
+    │   └── runB
+    │       └── trans_filtered_func_data.nii.gz
+    │
+    └── OTHER THINGS
+</pre></div>
+</div>
+<p>This is very config-able!</p>
+</div>
+<div class="section" id="config-file">
+<h2>Config file<a class="headerlink" href="#config-file" title="Permalink to this headline">¶</a></h2>
+<p>The configuration file uses <a class="reference external" href="http://www.yaml.org/start.html">Yaml</a>, and consists of experiment-wide and condition specific settings.
+Here, necessary parameters are in <strong>bold</strong>.</p>
+<dl class="docutils">
+<dt>Experiment-wide parameters are:</dt>
+<dd><ul class="first last simple">
+<li><strong>roi_files</strong>: path to rois to-be-loaded into experiment</li>
+<li><strong>sub_folder</strong>: where to store data from each Run. A single hdf5 file will be created per participant.</li>
+</ul>
+</dd>
+<dt>Condition-wide parameters are:</dt>
+<dd><ul class="first last simple">
+<li>base_dir: used as prefix for all paths in condition</li>
+<li><strong>nii_files</strong>: path to niftis (or npy files) to-be-loaded</li>
+<li>audio_env: path to audio envelope for stimulus</li>
+<li>offset: default 0. Shift each timecourse forward by offset.</li>
+<li>max_len: default None (all). Maximum length of timecourse.</li>
+<li>threshold: default ???. Drop voxels with mean activation below threshold.</li>
+<li>prop_pass_thresh: default ???. How many participants need to be above threshold to keep voxel at group level.</li>
+</ul>
+</dd>
+</dl>
+<p><strong>Using ``{var}`` magic</strong>:
+Setting <tt class="docutils literal"><span class="pre">roi_files</span></tt> and <tt class="docutils literal"><span class="pre">nii_files</span></tt> can be done by inserting <tt class="docutils literal"><span class="pre">{roi_file}</span></tt> or <tt class="docutils literal"><span class="pre">{nii_file}</span></tt> into their respective paths.
+For example, in the data we have in our folder, the path to rois is <tt class="docutils literal"><span class="pre">rois/{roi_id}.nii*</span></tt>.
+In searching for the path, <tt class="docutils literal"><span class="pre">pycorr</span></tt> will use both <tt class="docutils literal"><span class="pre">{roi_id}</span></tt> and <tt class="docutils literal"><span class="pre">*</span></tt> as wildcards.
+However, it will enter each matched nifti with the name of whatever matches <tt class="docutils literal"><span class="pre">{roi_id}</span></tt>.</p>
+<p>This takes advantage of <tt class="xref py py-func docutils literal"><span class="pre">pycorr.subject.get_subject_files()</span></tt>.</p>
+<p><strong>Repeating default condition parameters</strong>.
+Yaml lets you set parameters from one condition as defaults for another.
+An example of this is in the <tt class="docutils literal"><span class="pre">config.yaml</span></tt>.
+The following snippet shows a default condition in action:</p>
+<div class="highlight-python"><div class="highlight"><pre>default: &amp;default
+    max_offset: 10
+
+conditions:
+    condA:
+        &lt;&lt;: *default
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-pipeline">
+<h2>Running Pipeline<a class="headerlink" href="#running-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>To start the pipeline, enter <tt class="docutils literal"><span class="pre">python</span> <span class="pre">run.py</span></tt> in the console.
+The starter script, <tt class="docutils literal"><span class="pre">run.py</span></tt>, iterates over conditions and performs
+alignment, thresholding, makes a composite, and performs inter-subject correlation.</p>
 </div>
 </div>
 

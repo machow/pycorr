@@ -58,13 +58,16 @@
         
             <ul>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#python">Python</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html#installing-dependencies">Installing Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#installing-pycorr-on-rondo">Installing pycorr on Rondo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#installing-pycorr">Installing Pycorr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#using-pycorr-on-rondo">Using pycorr on Rondo</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-pipeline">Example Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#setting-up-pipeline-directory">Setting up Pipeline Directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-data-structure">Example Data Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#config-file">Config file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#running-pipeline">Running Pipeline</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
@@ -139,19 +142,13 @@
   </dt>
 
   </dl></td>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="api/pycorr.subject.html#pycorr.subject.AttrArray">AttrArray (class in pycorr.subject)</a>
-  </dt>
-
-  </dl></td>
 </tr></table>
 
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/pycorr.subject.html#pycorr.subject.Cond">Cond (class in pycorr.subject)</a>
+  <dt><a href="api/pycorr.subject.html#pycorr.subject.Exp.cond_thresh">cond_thresh() (pycorr.subject.Exp static method)</a>
   </dt>
 
       
@@ -166,14 +163,26 @@
   <dt><a href="api/pycorr.gen_corrmat.html#pycorr.gen_corrmat.corr_eig">corr_eig() (in module pycorr.gen_corrmat)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api/pycorr.funcs_correlate.html#pycorr.funcs_correlate.corsubs">corsubs() (in module pycorr.funcs_correlate)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api/pycorr.subject.html#pycorr.subject.Exp.create_cond">create_cond() (pycorr.subject.Exp method)</a>
+  </dt>
+
       
   <dt><a href="api/pycorr.subject.html#pycorr.subject.Run.create_dataset">create_dataset() (pycorr.subject.Run method)</a>
+  </dt>
+
+      
+  <dt><a href="api/pycorr.subject.html#pycorr.subject.Exp.create_roi">create_roi() (pycorr.subject.Exp method)</a>
+  </dt>
+
+      
+  <dt><a href="api/pycorr.subject.html#pycorr.subject.Exp.create_subrun">create_subrun() (pycorr.subject.Exp method)</a>
   </dt>
 
       
@@ -221,6 +230,16 @@
 
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api/pycorr.subject.html#pycorr.subject.Exp.gen_composite">gen_composite() (pycorr.subject.Exp method)</a>
+  </dt>
+
+      
+  <dt><a href="api/pycorr.subject.html#pycorr.subject.Exp.gen_cond_thresh">gen_cond_thresh() (pycorr.subject.Exp method)</a>
+  </dt>
+
+  </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api/pycorr.subject.html#pycorr.subject.Exp.get_subject_files">get_subject_files() (pycorr.subject.Exp static method)</a>
@@ -304,22 +323,18 @@
   <dt><a href="api/pycorr.funcs_correlate.html#module-pycorr.funcs_correlate">pycorr.funcs_correlate (module)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api/pycorr.gen_corrmat.html#module-pycorr.gen_corrmat">pycorr.gen_corrmat (module)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api/pycorr.pietools.html#module-pycorr.pietools">pycorr.pietools (module)</a>
   </dt>
 
       
   <dt><a href="api/pycorr.statistics.html#module-pycorr.statistics">pycorr.statistics (module)</a>
-  </dt>
-
-      
-  <dt><a href="api/pycorr.subject.html#module-pycorr.subject">pycorr.subject (module)</a>
   </dt>
 
       
@@ -360,6 +375,10 @@
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api/pycorr.pietools.html#pycorr.pietools.searchr">searchr() (in module pycorr.pietools)</a>
+  </dt>
+
+      
+  <dt><a href="api/pycorr.subject.html#pycorr.subject.Exp.setup">setup() (pycorr.subject.Exp method)</a>
   </dt>
 
       

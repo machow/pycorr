@@ -59,13 +59,14 @@
         
             <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="">Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#python">Python</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-dependencies">Installing Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installing-pycorr-on-rondo">Installing pycorr on Rondo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-pycorr">Installing Pycorr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-pycorr-on-rondo">Using pycorr on Rondo</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-pipeline">Example Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#setting-up-pipeline-directory">Setting up Pipeline Directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-data-structure">Example Data Structure</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
@@ -115,14 +116,27 @@
             
   <div class="section" id="setup">
 <h1>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="python">
-<h2>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h2>
-</div>
 <div class="section" id="installing-dependencies">
 <h2>Installing Dependencies<a class="headerlink" href="#installing-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>All dependencies are listed in <tt class="docutils literal"><span class="pre">requirements.txt</span></tt>.
+It&#8217;s a good idea to install everything into a <a class="reference external" href="http://docs.python-guide.org/en/latest/dev/virtualenvs/">virtual environment</a>, but feel free to be young and reckless :O.
+Alternatively, the <a class="reference external" href="https://store.continuum.io/cshop/anaconda/">Anaconda python distribution</a> contains all the necessary packages, except for <a class="reference external" href="http://nipy.org/nibabel/">nibabel</a>, which can be installed using <tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">nibabel</span></tt>.</p>
 </div>
-<div class="section" id="installing-pycorr-on-rondo">
-<h2>Installing pycorr on Rondo<a class="headerlink" href="#installing-pycorr-on-rondo" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="installing-pycorr">
+<h2>Installing Pycorr<a class="headerlink" href="#installing-pycorr" title="Permalink to this headline">¶</a></h2>
+<p>cd to the directory with pycorr, then <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt>.
+Since the package is still somewhat of a moving target, you might want to symlink it by using <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">develop</span></tt>.</p>
+</div>
+<div class="section" id="using-pycorr-on-rondo">
+<h2>Using pycorr on Rondo<a class="headerlink" href="#using-pycorr-on-rondo" title="Permalink to this headline">¶</a></h2>
+<p>pycorr is already installed in a virtual environment in the Hasson lab fileshare.
+Activate it by editing your PATH in <tt class="docutils literal"><span class="pre">~/.local</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre>setenv PATH=/jukebox/hasson/michael/venv/anaconda:$PATH
+</pre></div>
+</div>
+<p>Then, you can load the python environment by entering <tt class="docutils literal"><span class="pre">source</span> <span class="pre">activate</span> <span class="pre">trw-interl</span></tt> in the console.</p>
+<p>If you have a different shell, such as bash, enabled by default&#8211;then it may be better to edit <tt class="docutils literal"><span class="pre">~/.bash_login</span></tt>.
+Replace <tt class="docutils literal"><span class="pre">setenv</span></tt> with <tt class="docutils literal"><span class="pre">export</span></tt>.</p>
 </div>
 </div>
 

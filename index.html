@@ -58,13 +58,16 @@
         
             <ul>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#python">Python</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html#installing-dependencies">Installing Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#installing-pycorr-on-rondo">Installing pycorr on Rondo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#installing-pycorr">Installing Pycorr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#using-pycorr-on-rondo">Using pycorr on Rondo</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-pipeline">Example Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#setting-up-pipeline-directory">Setting up Pipeline Directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-data-structure">Example Data Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#config-file">Config file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#running-pipeline">Running Pipeline</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
@@ -114,17 +117,43 @@
             
   <div class="section" id="welcome-to-pycorr-s-documentation">
 <h1>Welcome to pycorr&#8217;s documentation!<a class="headerlink" href="#welcome-to-pycorr-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Pycorr allows you to produce quick, replicable pipelines for inter-subject correlation analyses.
+Oftentimes, analysis scripts become a tangled mess of experiment specific parameters and file paths.
+Sometimes you&#8217;re left with a dozen different folders with the data saved in slightly different ways, and names like &#8220;sub1_cropleft2_cropright4.nii&#8221;.
+We&#8217;ve all been there. No judgement. pycorr can help alleviate your research woes by doing a few things:</p>
+<ol class="arabic simple">
+<li>Seperating parameter configuration from analysis scripts</li>
+<li>Modular structure, with functions for loading, analyzing, and saving data</li>
+<li>Support for HDF5 using <a class="reference internal" href="#h5py">H5py</a>. This allows you to store parameters in the data, rather than in it&#8217;s filename :).</li>
+<li>Command-line tools for running analyses</li>
+<li>Unit-tests and documentation</li>
+</ol>
+<p><span class="target" id="h5py">H5py</span>: <a class="reference external" href="http://www.h5py.org/">http://www.h5py.org/</a></p>
+</div>
+<div class="section" id="general-workflow">
+<h1>General Workflow<a class="headerlink" href="#general-workflow" title="Permalink to this headline">¶</a></h1>
+<p>The bulk of most pycorr analyses consist of two parts:</p>
+<ol class="arabic simple">
+<li>Configuration file</li>
+<li>Analysis script</li>
+</ol>
+<p>The configuration file has basic settings, such as filepaths to the data.
+The analysis scripts takes advantage of the two classes, <tt class="docutils literal"><span class="pre">Exp</span></tt> and <tt class="docutils literal"><span class="pre">Run</span></tt>.
+<tt class="docutils literal"><span class="pre">Exp</span></tt> loads the data using the config file, and <tt class="docutils literal"><span class="pre">Run</span></tt> wraps each functional run.</p>
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#python">Python</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html#installing-dependencies">Installing Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#installing-pycorr-on-rondo">Installing pycorr on Rondo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#installing-pycorr">Installing Pycorr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#using-pycorr-on-rondo">Using pycorr on Rondo</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-pipeline">Example Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#setting-up-pipeline-directory">Setting up Pipeline Directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#example-data-structure">Example Data Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#config-file">Config file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#running-pipeline">Running Pipeline</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
