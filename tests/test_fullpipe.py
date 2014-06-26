@@ -15,7 +15,7 @@ class test_fullpipe(object):
         self.orig_path = os.getcwd()
         self.tmpdir = tempfile.mkdtemp()
         setup_fname = os.path.abspath('setup_example.py')
-        self.perm_fname = os.path.abspath('pycorr/cli/permute_isc_within.py')
+        self.perm_fname = os.path.abspath('cli/permute_isc_within.py')
 
         os.chdir(self.tmpdir)
         subprocess.call(['python', setup_fname, 'test'])
@@ -55,41 +55,37 @@ class test_fullpipe(object):
         assert np.allclose(C, sol)
 
     def test_perm_sim_serial(self):
-        perm_fname = self.perm_fname
         sol = np.load('pipeline/subjects/test_sol.npy')
 
-        subprocess.call('python %s -t -x all -o test_out --n_reps 10'%perm_fname, shell=True)
+        subprocess.call('python cli/permute_isc_within.py -t -x all -o test_out --n_reps 10', shell=True)
         C = np.load('test_out/isc_corrmat/all.npy')
         indx_A = range(3)
         assert np.allclose(C[..., indx_A,:][...,:,indx_A], sol)
 
     def test_perm_sim_parallel(self):
-        perm_fname = self.perm_fname
         sol = np.load('pipeline/subjects/test_sol.npy')
         for ii, _ in enumerate(sol):
             print ii
-            subprocess.call('python %s -t -x %s -o test_out --n_reps 10'%(perm_fname, ii), shell=True) #run analysis
-        subprocess.call('python pycorr/cli/splice_dir.py -s test_out/isc_corrmat', shell=True)                        #splice back together
+            subprocess.call('python cli/permute_isc_within.py -t -x %s -o test_out --n_reps 10'%ii, shell=True) #run analysis
+        subprocess.call('python cli/splice_dir.py -s test_out/isc_corrmat', shell=True)                        #splice back together
         C = np.load('test_out/isc_corrmat.npy')
         indx_A = range(3)
         assert np.allclose(C[..., indx_A,:][...,:,indx_A], sol)
 
     def test_perm_serial(self):
-        perm_fname = self.perm_fname
         sol = np.load('pipeline/subjects/test_sol.npy')
 
-        subprocess.call('python %s --hdf5 test.h5 -a test_cond -x all -o test_out --isc_only'%perm_fname, shell=True)
+        subprocess.call('python cli/permute_isc_within.py --hdf5 test.h5 -a test_cond -x all -o test_out --isc_only', shell=True)
         C = np.load('test_out/isc_corrmat/all.npy')
         indx_A = range(3)
         assert np.allclose(C[..., indx_A,:][...,:,indx_A], sol)
 
     def test_perm_parallel(self):
-        perm_fname = self.perm_fname
         sol = np.load('pipeline/subjects/test_sol.npy')
         for ii, _ in enumerate(sol):
             print ii
-            subprocess.call('python %s --hdf5 test.h5 -a test_cond -x %s -o test_out --isc_only'%(perm_fname, ii), shell=True) #run analysis
-        subprocess.call('python pycorr/cli/splice_dir.py -s test_out/isc_corrmat', shell=True)                        #splice back together
+            subprocess.call('python cli/permute_isc_within.py --hdf5 test.h5 -a test_cond -x %s -o test_out --isc_only'%ii, shell=True) #run analysis
+        subprocess.call('python cli/splice_dir.py -s test_out/isc_corrmat', shell=True)                        #splice back together
         C = np.load('test_out/isc_corrmat.npy')
         indx_A = range(3)
         assert np.allclose(C[..., indx_A,:][...,:,indx_A], sol)

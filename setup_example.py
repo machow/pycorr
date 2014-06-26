@@ -9,7 +9,7 @@ if len(sys.argv) > 1:
     example_dir = sys.argv[1]
     shutil.copy2(join(basedir, 'examples', example_dir, 'config.yaml'), 'config.yaml')
     shutil.copy2(join(basedir, 'tests/run_pipe.py'), 'run.py')
-    os.symlink(join(basedir, 'pycorr'), 'pycorr')
+    os.symlink(join(basedir, 'pycorr/cli'), 'cli')
 
     if example_dir == 'full': 
         print "setting up full example (using nifti files and ROIS)"

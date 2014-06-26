@@ -1,0 +1,31 @@
+#
+#GENERAL SETTINGS
+roi_files: 'path/to/rois/{roi_id}.nii*'     # where to load roi files from
+sub_folder: subjects                        # where to save subject data
+
+#GROUP SETTINGS
+# DEFAULT SETTINGS FOR CONDITIONS
+# (notice that some YAML magic is used to add defaults to all conditions)
+default: &default
+    base_dir: 'path/to/inputdata'
+    #audio_env: 'filename.npy'
+    #prop_pass_thresh: .70
+    #offset: 10
+    #max_len: 280
+    #threshold: 6000
+    
+conds:
+    condA:
+        # Add defaults
+        <<: *default
+        # Condition specific settings
+        nii_files: #"{sub_id}/condname/*nii*"
+        notes: #"description of experiment"
+        run: runA
+
+    condB:
+        <<: *default
+        # Note that wordscram2 uses the same niftis as the previous condition
+        nii_files: #"{sub_id}/condname/*nii*"
+        notes: "Pieman story scrambled at the word level"
+        run: runB
