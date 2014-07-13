@@ -1,5 +1,5 @@
 from gen_corrmat import corr_eig
-from pycorr.statistics import isc_within_diff, isc_corrmat_within_diff, perm
+from pycorr.stats.perm import isc_within_diff, isc_corrmat_within_diff, perm
 import numpy as np
 
 def test_perm_test_is_permuting():

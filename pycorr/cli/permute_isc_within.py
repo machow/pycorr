@@ -12,14 +12,12 @@ Outputs:
 E.G. permute_isc_within.py -t -x 'all' -o test_out
 """
 
-import os, sys, argparse
-basedir = os.path.dirname(__file__)
-sys.path.append(os.path.abspath(basedir + '/../..'))
+import os, argparse
 
-def permute_isc_within(a, b, x, outfile, mask='', isc_only=False, hdf5=None, thresh=6000, n_pass=.7, n_reps=1000, t=False):
+def permute_isc_within(a, b, x, outfile, mask='', meth=None, hdf5=None, thresh=6000, n_pass=.7, n_reps=10000, t=False, kwargs=None):
+    if not kwargs: kwargs = {}
     import numpy as np
     from pycorr.funcs_correlate import crosscor, intersubcorr
-    from pycorr.statistics import perm, isc_corrmat_within_diff
     from pycorr.subject import Run, Exp
     from pycorr.pietools import mkdir_p, parse_section, arr_slice
     # TASK ID so script knows where to slice, converts SGE_TASK_ID to 0-indexed
@@ -58,7 +56,6 @@ def permute_isc_within(a, b, x, outfile, mask='', isc_only=False, hdf5=None, thr
         if b:  #TODO fix, so hacky.. this script needs structure (want to let arg.b be optional
             B = [run.load(standardized=True, threshold=True, _slice=ID) for run in E.iter_runs(b[0])]
         else: B = []
-        E.get_cond(a[0])
         out['thresh_fail'] = E.get_cond(a[0])['threshold'][...]
 
     # Combine group indices for correlation matrix (we will shuffle these) --------
@@ -70,16 +67,19 @@ def permute_isc_within(a, b, x, outfile, mask='', isc_only=False, hdf5=None, thr
     # Cross-Correlation matrix (we will permute rows and columns) -----------------
     out['isc_corrmat'] = crosscor(A+B, standardized=False)
     out['isc_A'] = intersubcorr(out['isc_corrmat'][..., indx_A, :][..., :, indx_A])
+    out['isc_B'] = intersubcorr(out['isc_corrmat'][..., indx_B, :][..., :, indx_B])
 
     # Permutation Test ------------------------------------------------------------
-    if not isc_only:
-        out_shape = (n_reps, ) + out['isc_corrmat'].shape[:-2]      #n_reps x spatial_dims
-        swap_dims = range(1,len(out_shape)) + [0]                        #list with first and last dims swapped
-        out['null'] = perm(indx_A, indx_B, isc_corrmat_within_diff, C = out['isc_corrmat'],
-                        nreps=n_reps, out=np.zeros(out_shape))
-        out['null'] = out['null'].transpose(swap_dims)                            #put corrs on last dim
-        out['r'] = isc_corrmat_within_diff(indx_A, indx_B, out['isc_corrmat'])[..., np.newaxis] #since 1 corr, add axis for broadcasting
-        out['p'] = np.mean(np.abs(out['r']) <= np.abs(out['null']), axis=-1)
+    if meth == 'perm':
+        from pycorr.stats.perm import run_perm
+        res = run_perm(indx_A, indx_B, out['isc_corrmat'], n_reps)
+        out.update(res)
+
+    # Bootstrap Test ----------------------------------------------------------
+    elif meth == 'boot':
+        from pycorr.stats.boot import run_boot_within_isc_diff
+        res = run_boot_within_isc_diff(A, B, n_samples=n_reps, **kwargs)
+        out.update(res)
 
     # Output ----------------------------------------------------------------------
     outtmp = os.path.join(outfile, "{fold}/{ID}.npy")
@@ -90,20 +90,24 @@ def permute_isc_within(a, b, x, outfile, mask='', isc_only=False, hdf5=None, thr
 
 
 if __name__ == '__main__':
+    import yaml 
 
     # ARG PARSING
-    parser = argparse.ArgumentParser(description= __doc__)
+    parser = argparse.ArgumentParser(description= __doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('-t', help='run test', action='store_true')
     parser.add_argument('-a', nargs='*', help='niftis in first group or condname if hdf5')
     parser.add_argument('-b', nargs='*', help='niftis in second group or condname if hdf5')
     parser.add_argument('-x', type=str, help='slice along row of input arrays to analyze. Can be "all" or slice notation (e.g. ::2)')  
     parser.add_argument('-o', '--outfile', type=str, help='output folder')
     parser.add_argument('-m', '--mask', type=str, help='boolean timecourse mask for subsetting')
-    parser.add_argument('--isc_only', action='store_true', help='just calculate intersubject correlation, instead of running perm test')
+    parser.add_argument('--meth', default='boot', help='type of test (perm or bootstrap)')
     parser.add_argument('--hdf5', nargs='?', help='hdf5 pipeline to load niftis from')
     parser.add_argument('--thresh', default=6000, help='threshold activation below this level. (not implemented,  hardcoded)')
     parser.add_argument('--n_pass', default=.7, help='number of participants above threshold. (not implemented, hardcoded)')
-    parser.add_argument('--n_reps', type=int, default=1000, help='number of permutations to apply')
-    args = parser.parse_args()
+    parser.add_argument('--n_reps', type=int, default=10000, help='number of permutations to apply')
+    parser.add_argument('--kwargs', type=yaml.load, help="""additional arguments to pass to test function in YAML format. (e.g. "{a: 1, b: two}")""")
+    args = vars(parser.parse_args())
+    print args
 
-    permute_isc_within(**args.__dict__)
+    permute_isc_within(**args)
