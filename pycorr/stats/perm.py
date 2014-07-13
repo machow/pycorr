@@ -1,5 +1,5 @@
 import numpy as np
-from funcs_correlate import corcomposite, sum_tc, intersubcorr
+from pycorr.funcs_correlate import corcomposite, sum_tc, intersubcorr
 from scipy.stats import nanmean
 
 def isc_within_diff(A, B, standardized=False):
@@ -62,4 +62,16 @@ def perm(A, B, fun, nreps = 1, out = None,  **kwargs):
 
     return out
 
+def run_perm(indx_A, indx_B, C, n_reps):
+    out = {}
 
+    out_shape = (n_reps, ) + C.shape[:-2]      #n_reps x spatial_dims
+    out_arr = np.zeros(out_shape, dtype=float)
+    swap_dims = range(1,len(out_shape)) + [0]                        #list with first and last dims swapped
+
+    out['null'] = perm(indx_A, indx_B, isc_corrmat_within_diff, C = C,
+                    nreps=n_reps, out=out_arr)
+    out['null'] = out['null'].transpose(swap_dims)                            #put corrs on last dim
+    out['r'] = isc_corrmat_within_diff(indx_A, indx_B, C)[..., np.newaxis] #since 1 corr, add axis for broadcasting
+    out['p'] = np.mean(np.abs(out['r']) <= np.abs(out['null']), axis=-1)
+    return out
