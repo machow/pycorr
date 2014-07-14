@@ -12,6 +12,14 @@ def bootstrap_ts_indexes(data, l, n_samples=10000, method='circular'):
     Given data points data, where axis 0 is considered to delineate points, return
     an array where each row is a set of bootstrap indexes. This can be used as a list
     of bootstrap indexes as well.
+
+    Parameters:
+        data (ndarray): data to be resampled on axis 0
+        l:              time window
+        n_samples:      number of bootstrap samples to take
+        method:         timeseries method (fixed, moving, circular). Only circular is implemented.
+
+    Returns: index array with dim (n_samples X data.shape[0])
     """
     npoints = data.shape[0]
     if method == 'circular': 
@@ -80,6 +88,10 @@ def ts_boot(dlist, func, l, n_samples=10000, method='circular', out=None, indx_f
         func:           func to run over new samples
         n_samples:      number of bootstrapped samples to draw
         kwargs:         additional arguments for func
+
+    Returns: 
+        array with results of func call over each bootstrapped sample,
+        has dimension [n_samples x dim(func(dlist))].
     """
     assert len(np.unique([data.shape[-1] for data in dlist])) == 1    #All have same number timepoints
     
@@ -99,7 +111,7 @@ def isc_within_boot(dlist, standardized=False):
     intersubcorr(crosscor(dlist, standardized=True))
     
     
-def run_boot_within_isc_diff(A, B, l, n_reps, out_arr=None):
+def run_boot_within_isc_diff(A, B, l, n_reps, out_arr=None, indx_file=''):
     out = {}
 
     out_shape = (n_reps, ) + A[0].shape[:-1]      #n_reps x spatial_dims
@@ -107,8 +119,8 @@ def run_boot_within_isc_diff(A, B, l, n_reps, out_arr=None):
     swap_dims = range(1,len(out_shape)) + [0]                        #list with first and last dims swapped
 
     calc_mean_isc = lambda dlist: intersubcorr(crosscor(dlist, standardized=True)).mean(axis=-1)
-    out['distA'] = ts_boot(A, calc_mean_isc, l, n_samples=n_reps, out = out_arr.copy())
-    out['distB'] = ts_boot(B, calc_mean_isc, l, n_samples=n_reps, out = out_arr.copy())
+    out['distA'] = ts_boot(A, calc_mean_isc, l, n_samples=n_reps, out = out_arr.copy(), indx_file=indx_file)
+    out['distB'] = ts_boot(B, calc_mean_isc, l, n_samples=n_reps, out = out_arr.copy(), indx_file=indx_file)
     for k in ['distA', 'distB']: out[k] = out[k].transpose(swap_dims)
     out['r'] = (calc_mean_isc(A) - calc_mean_isc(B))[..., np.newaxis] #since 1 corr, add axis for broadcasting
     out['p_gt'] = (out['distA'] - out['distB'] > 0).mean(axis=-1)
