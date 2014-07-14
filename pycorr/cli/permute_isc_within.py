@@ -16,7 +16,7 @@ import os, sys, argparse
 basedir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(basedir + '/../..'))
 
-def permute_isc_within(a, b, x, outfile, mask='', test='perm', hdf5=None, thresh=6000, n_pass=.7, n_reps=1000, t=False):
+def permute_isc_within(a, b, x, outfile, mask='', test='perm', hdf5=None, thresh=6000, n_pass=.7, n_reps=1000, t=False, kwargs=()):
     import numpy as np
     from pycorr.funcs_correlate import crosscor, intersubcorr
     from pycorr.subject import Run, Exp
@@ -79,7 +79,7 @@ def permute_isc_within(a, b, x, outfile, mask='', test='perm', hdf5=None, thresh
     # Bootstrap Test ----------------------------------------------------------
     elif test == 'boot':
         from pycorr.stats.boot import run_boot_within_isc_diff
-        res = run_boot_within_isc_diff(A, B, 1, n_reps)
+        res = run_boot_within_isc_diff(A, B, n_samples=n_reps, **kwargs)
         out.update(res)
 
     # Output ----------------------------------------------------------------------
@@ -91,6 +91,7 @@ def permute_isc_within(a, b, x, outfile, mask='', test='perm', hdf5=None, thresh
 
 
 if __name__ == '__main__':
+    import yaml 
 
     # ARG PARSING
     parser = argparse.ArgumentParser(description= __doc__)
@@ -105,6 +106,8 @@ if __name__ == '__main__':
     parser.add_argument('--thresh', default=6000, help='threshold activation below this level. (not implemented,  hardcoded)')
     parser.add_argument('--n_pass', default=.7, help='number of participants above threshold. (not implemented, hardcoded)')
     parser.add_argument('--n_reps', type=int, default=1000, help='number of permutations to apply')
+    parser.add_argument('--kwargs', type=yaml.load, help="""additional arguments to pass to test function in YAML format. (e.g. "{a: 1, b: two}")""")
     args = parser.parse_args()
+    print args
 
     permute_isc_within(**args.__dict__)

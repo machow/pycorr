@@ -111,16 +111,16 @@ def isc_within_boot(dlist, standardized=False):
     intersubcorr(crosscor(dlist, standardized=True))
     
     
-def run_boot_within_isc_diff(A, B, l, n_reps, out_arr=None, indx_file=''):
+def run_boot_within_isc_diff(A, B, l, n_samples, out_arr=None, indx_file=''):
     out = {}
 
-    out_shape = (n_reps, ) + A[0].shape[:-1]      #n_reps x spatial_dims
+    out_shape = (n_samples, ) + A[0].shape[:-1]      #n_reps x spatial_dims
     out_arr = np.zeros(out_shape, dtype=float)
     swap_dims = range(1,len(out_shape)) + [0]                        #list with first and last dims swapped
 
     calc_mean_isc = lambda dlist: intersubcorr(crosscor(dlist, standardized=True)).mean(axis=-1)
-    out['distA'] = ts_boot(A, calc_mean_isc, l, n_samples=n_reps, out = out_arr.copy(), indx_file=indx_file)
-    out['distB'] = ts_boot(B, calc_mean_isc, l, n_samples=n_reps, out = out_arr.copy(), indx_file=indx_file)
+    out['distA'] = ts_boot(A, calc_mean_isc, l, n_samples=n_samples, out = out_arr.copy(), indx_file=indx_file)
+    out['distB'] = ts_boot(B, calc_mean_isc, l, n_samples=n_samples, out = out_arr.copy(), indx_file=indx_file)
     for k in ['distA', 'distB']: out[k] = out[k].transpose(swap_dims)
     out['r'] = (calc_mean_isc(A) - calc_mean_isc(B))[..., np.newaxis] #since 1 corr, add axis for broadcasting
     out['p_gt'] = (out['distA'] - out['distB'] > 0).mean(axis=-1)
