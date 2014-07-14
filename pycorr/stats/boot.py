@@ -50,9 +50,9 @@ def b_star(data, Kn = None, mmax = None, Bmax = None, c = None,
         if np.any(num_insig == Kn): 
             # mhat is indx of first with Kn insig
             mhat = np.where(num_insig == Kn)[0][0] + 1   #[indx_tuple][arr_pos]
-        elif np.any(np.abs(rho_k) > rho_k_crit):
+        elif (np.abs(rho_k) > rho_k_crit).sum() == 1:
             # mhat is indx of max rho_k greater than rho_k_crit
-            mhat = max(np.where(np.abs(rho_k) > rho_k_crit)) + 1
+            mhat = np.where(np.abs(rho_k) > rho_k_crit)[0][0] + 1
         else: mhat = 1
         
         M = min(2*mhat, mmax)
