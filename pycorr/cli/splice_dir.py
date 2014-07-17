@@ -1,4 +1,5 @@
 import sys, os
+import gc
 basedir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(basedir + '/../..'))
 
@@ -27,18 +28,21 @@ def splice_dir(dirnames, save, nifti, thresh, check, alldirs, mat):
         M = splice_dir(dirname, save=False, mmap='r')
         print M.shape
         if thresh: 
-            thresh = load_nii_or_npy(thresh)
-            M[thresh] = np.nan
+            tmp_thresh = load_nii_or_npy(thresh)
+            M[tmp_thresh] = np.nan
 
         if save: np.save(dirname, M)
 
         if nifti:
-            nii = copy_nii_hdr(nifti, M, save=dirname + ".nii.gz")
+            copy_nii_hdr(nifti, M, save=dirname + ".nii.gz")
             #WRITE SAVING LINE HERE
 
         if mat:
             import scipy.io as sio
             sio.savemat(dirname, {'data': M})
+        # Garbage collect, since M can be large
+        del M
+        gc.collect()
 
 
 
