@@ -19,7 +19,7 @@ def load_nii_or_npy(fname):
     if os.path.splitext(fname)[1] == '.npy': return np.load(fname)
     else: return nib.load(fname).get_data()
 
-def copy_nii_hdr(nii, data, save=""):
+def copy_nii_hdr(nii, data, save="", neglog=False, nan=None):
     """Returns a nifti object using another nifti's header
     
     Dimensions are changed to correspond with data shape
@@ -28,8 +28,16 @@ def copy_nii_hdr(nii, data, save=""):
         nii - nifti file to take header from
         data - data file to convert to Nifti1Image
         save - file name to save to, no save if blank
+        neglog - take the negative log10 of data before saving
+        nan - set nans to this value
     """
     if type(nii) is str: nii = nib.load(nii)
+    if type(data) is str: data = np.load(data)
+
+    # Data transformations
+    if nan: data[np.isnan(data)] = nan
+    if neglog: data = p_neglog10(data)
+
     hdr = nii.get_header()
     affine = nii.get_affine()
     new_hdr = hdr.copy()
@@ -37,6 +45,11 @@ def copy_nii_hdr(nii, data, save=""):
     new_nii = nib.Nifti1Image(data, affine, new_hdr)
     if save: nib.save(new_nii, save)
     return new_nii
+
+def p_neglog10(data, rm_nan=True):
+    data = data.copy()
+    data[np.isnan(data)] = 1
+    return -np.log10(data)
 
 
 def query_to_re_groups(query):
