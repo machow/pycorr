@@ -43,6 +43,20 @@ def test_ts_boot_mean():
     ts_boot(data, np.mean, dvs, out=out, axis=-1)
     assert np.all(np.abs(out.mean(axis=0) - 1) < .1)
 
+from pycorr.stats.boot import run_boot_within_isc_diff, calc_mean_isc, calc_mean_isc2
+from pycorr.gen_corrmat import corr_eig
+def test_ts_boot_isc_within():
+    """Test A_isc > B_isc w/data that yields exact correlation matrix."""
+
+    _, A = corr_eig(.64, 4, 100)
+    _, B = corr_eig(.49, 4, 100)
+    A, B = A.T, B.T
+    res = run_boot_within_isc_diff(A, B, l=2, n_samples=100, 
+                             out_arr=None)
+    assert np.allclose(calc_mean_isc(A), calc_mean_isc2(A))
+    assert res['p_gt'] < .05
+    
+
 #rpy2 tests for b_star
     # 1 dimensional
     # 2 dimensional

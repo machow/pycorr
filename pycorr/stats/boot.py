@@ -106,10 +106,18 @@ def ts_boot(dlist, func, l, n_samples=10000, method='circular', out=None, indx_f
         out[ii] = func(sample, **kwargs)
     return np.array(out, copy=False)
 
-from pycorr.funcs_correlate import intersubcorr, crosscor
+from pycorr.funcs_correlate import intersubcorr, crosscor, corcomposite, sum_tc, standardize
 from scipy.stats import nanmean
-def calc_mean_isc(dlist): return nanmean(intersubcorr(crosscor(dlist, standardized=False)), axis=-1)
-    
+def calc_mean_isc2(dlist): 
+    """calculate within group ISC by first deriving cross correlation matrix"""
+    return nanmean(intersubcorr(crosscor(dlist, standardized=False)), axis=-1)
+
+def calc_mean_isc(dlist): 
+    """standardize subjects, then correlate against sum of others."""
+    dlist = [standardize(sub, inplace=False) for sub in dlist]
+    dsummed = sum_tc(dlist, nans = True, standardize_subs = False)
+    return nanmean([corcomposite(sub, dsummed) for sub in dlist], axis=-1)
+
 def run_boot_within_isc_diff(A, B, l, n_samples, out_arr=None, indx_file=''):
     out = {}
 
@@ -119,8 +127,11 @@ def run_boot_within_isc_diff(A, B, l, n_samples, out_arr=None, indx_file=''):
 
     out['distA'] = ts_boot(A, calc_mean_isc, l, n_samples=n_samples, out = out_arr.copy(), indx_file=indx_file)
     out['distB'] = ts_boot(B, calc_mean_isc, l, n_samples=n_samples, out = out_arr.copy(), indx_file=indx_file)
+    # swap axis with correlations to be last dim
     for k in ['distA', 'distB']: out[k] = out[k].transpose(swap_dims)
-    out['r'] = (calc_mean_isc(A) - calc_mean_isc(B))[..., np.newaxis] #since 1 corr, add axis for broadcasting
+    # since 1 corr, add axis for broadcasting
+    out['r'] = (calc_mean_isc(A) - calc_mean_isc(B))[..., np.newaxis]
+    # calc one-sided p-values against null that diff is 0 
     out['p_ltq'] = (out['distA'] - out['distB'] >= 0).mean(axis=-1)
     out['p_gt'] = (out['distA'] - out['distB'] < 0).mean(axis=-1)
     return out
