@@ -117,7 +117,7 @@ def calc_mean_isc2(dlist):
     """standardize subjects, then correlate against sum of others."""
     dlist = [standardize(sub, inplace=False) for sub in dlist]
     dsummed = sum_tc(dlist, nans = True, standardize_subs = False)
-    return nanmean([corcomposite(sub, dsummed) for sub in dlist], axis=-1)
+    return nanmean([corcomposite(sub, dsummed) for sub in dlist], axis=0)
 
 def run_boot_within_isc_diff(A, B, l, n_samples, out_arr=None, indx_file=''):
     out = {}
