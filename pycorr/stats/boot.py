@@ -108,11 +108,12 @@ def ts_boot(dlist, func, l, n_samples=10000, method='circular', out=None, indx_f
 
 from pycorr.funcs_correlate import intersubcorr, crosscor, corcomposite, sum_tc, standardize
 from scipy.stats import nanmean
-def calc_mean_isc2(dlist): 
-    """calculate within group ISC by first deriving cross correlation matrix"""
-    return nanmean(intersubcorr(crosscor(dlist, standardized=False)), axis=-1)
-
 def calc_mean_isc(dlist): 
+    """calculate within group ISC by first deriving cross correlation matrix"""
+    dlist = [standardize(sub, inplace=False) for sub in dlist]
+    return nanmean(intersubcorr(crosscor(dlist, standardized=True)), axis=-1)
+
+def calc_mean_isc2(dlist): 
     """standardize subjects, then correlate against sum of others."""
     dlist = [standardize(sub, inplace=False) for sub in dlist]
     dsummed = sum_tc(dlist, nans = True, standardize_subs = False)
