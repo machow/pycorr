@@ -47,9 +47,9 @@ def permute_isc_within(a, b, x, outfile, mask='', meth=None, hdf5=None, thresh=6
         Run = Run(h5py.File('dummy.h5'))
 
         # threshold tcs with low mean
-        for dat in A+B: dat[Run.threshold(6000, dat)] = np.nan      
+        for dat in A+B: dat[Run.threshold(thresh, dat)] = np.nan      
         thresh_pass = [~np.isnan(dat.sum(axis=-1)) for dat in A+B]
-        out['thresh_fail'] = Exp.cond_thresh(thresh_pass, mustpassprop=.7)
+        out['thresh_fail'] = Exp.cond_thresh(thresh_pass, mustpassprop=n_pass)
     else:
         E = Exp(hdf5)
         A = [run.load(use_subset=mask, standardized=True, threshold=True,  _slice=ID) for run in E.iter_runs(a[0])]
