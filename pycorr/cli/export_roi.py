@@ -62,7 +62,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = __doc__)
     parser.add_argument('h5file',                help='experiment file (something.h5)')
     parser.add_argument('-c', '--cond_name', nargs='*',   help='conditions within experiment')
-    parser.add_argument('-r', '--roi_name',  nargs='*',   help='names of rois to export')
+    parser.add_argument('-r', '--rois',  nargs='*',   help='names of rois to export')
     parser.add_argument('out_dir',   nargs='?', help='output directory')
     parser.add_argument('-l', '--conds',          help='list conditions', action='store_true')
     parser.add_argument('-s', '--subs',          help='list subjects', action='store_true')
@@ -71,6 +71,7 @@ if __name__ == '__main__':
     if args.conds or args.subs:
         summarize(args.h5file, args.conds, args.subs)
 
-    sigargs = inspect.getcallargs(export_roi, 'DNE')
-    kwargs = {k:v for k,v in args.__dict__.iteritems() if v != 'DNE'}
+    sigargs = inspect.getargspec(export_roi).args
+    kwargs = {k:v for k,v in args.__dict__.iteritems() if k in sigargs}
+    print kwargs
     export_roi(**kwargs)
