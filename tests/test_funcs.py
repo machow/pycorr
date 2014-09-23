@@ -10,34 +10,40 @@ from pycorr.funcs_correlate import standardize, corsubs, crosscor, intersubcorr
 
 np.random.seed(10)
 
+# Data Dimensions
 dims = (2,2, 10)
 nsubs = 3
+# Generate Data
 subs = [np.random.random(dims) for ii in range(nsubs)]
 for M in subs: M[0,0] = range(dims[-1])   #0,0 is 1:N
 for M in subs: standardize(M, inplace=True)
 subs[0][1,1] = np.NAN                     #1,1 sub 0 has a NaN timecourse
 
+# ISC from crosscor (correlation matrix) --------------------------------------
 C_all = crosscor(subs, standardized=True)
 C_all[1,1,0] = np.NAN
 isc1 = intersubcorr(C_all)
+isc1[1,1,0] = np.nan
 
+# ISC from item x others  -----------------------------------------------------
 M_ttl = np.nansum(subs, axis=0)
 isc2 = np.array([corsubs(M, M_ttl-M) for M in subs]).transpose([1,2,0])
 
+# ISC from item-total using Wherry formula ------------------------------------
 isc3_list = []
 for M in subs:
-    r_all = corsubs(M, M_ttl)
-    s_all = np.std(M_ttl, axis=-1, ddof=1)
-    s_i = np.std(M, axis=-1, ddof=1)
+    r_all = corsubs(M, M_ttl)                # item-total correlation
+    s_all = np.std(M_ttl, axis=-1, ddof=1)   # standard dev of total
+    s_i = np.std(M, axis=-1, ddof=1)         # standard dev of item
     M_cors = (r_all*s_all - s_i) / \
             np.sqrt(s_i**2 + s_all**2 - 2*s_i*s_all*r_all) #wherry formula
     isc3_list.append(M_cors)
 isc3 = np.array(isc3_list).transpose([1,2,0])
 
-def test_intersubcorrXmeantc():
+def test_crosscorXmeantc():
     assert_almost_equal(isc1, isc2)
 
-def test_intersubcorrXwherry():
+def test_crosscorXwherry():
     assert_almost_equal(isc1, isc3)
 
 def test_meantcXwherry():

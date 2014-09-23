@@ -104,6 +104,11 @@ def intersubcorr(C_all, excludeself = True):
         C_all      : ndarray with correlation matrix on last two dims
         excludeself: remove participant from ISC calculation
 
+    Warning:
+        subject timecourses that are NAN will return an intersub correlation
+        of 0 (not NAN). This means that thresholding needs to be taken into account
+        if you are trying to get mean isc from the output of this function.
+
     """
     covttl = np.apply_over_axes(np.nansum, C_all, [-1,-2]).reshape(C_all.shape[:-2])
     covcolsums = np.nansum(C_all, axis=-1)
