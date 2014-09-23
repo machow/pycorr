@@ -4,7 +4,7 @@ from funcs_correlate import shift, standardize
 from pietools import load_nii_or_npy, is_numeric
 import numpy as np
 
-class AttrArray(np.ndarray):
+class AttrArray(np.memmap):
     """Subclass of ndarray. Provides attributes property to match hdf5 dset.
     
     This is used when data are not loaded into hdf5, but externally"""
