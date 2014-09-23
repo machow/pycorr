@@ -70,6 +70,7 @@ def permute_isc_within(a, b, x, outfile, mask='', meth=None, hdf5=None, thresh=6
     out['isc_B'] = intersubcorr(out['isc_corrmat'][..., indx_B, :][..., :, indx_B])
 
     # Permutation Test ------------------------------------------------------------
+    #ipdb.set_trace()
     if meth == 'perm':
         from pycorr.stats.perm import run_perm
         res = run_perm(indx_A, indx_B, out['isc_corrmat'], n_reps)
@@ -103,8 +104,8 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--mask', type=str, help='boolean timecourse mask for subsetting')
     parser.add_argument('--meth', default='boot', help='type of test (perm or bootstrap)')
     parser.add_argument('--hdf5', nargs='?', help='hdf5 pipeline to load niftis from')
-    parser.add_argument('--thresh', default=6000, help='threshold activation below this level. (not implemented,  hardcoded)')
-    parser.add_argument('--n_pass', default=.7, help='number of participants above threshold. (not implemented, hardcoded)')
+    parser.add_argument('--thresh', type=float, default=6000, help='threshold activation below this level. (not implemented,  hardcoded)')
+    parser.add_argument('--n_pass', type=float, default=.7, help='number of participants above threshold. (not implemented, hardcoded)')
     parser.add_argument('--n_reps', type=int, default=10000, help='number of permutations to apply')
     parser.add_argument('--kwargs', type=yaml.load, help="""additional arguments to pass to test function in YAML format. (e.g. "{a: 1, b: two}")""")
     args = vars(parser.parse_args())
