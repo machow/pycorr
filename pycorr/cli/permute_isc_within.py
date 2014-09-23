@@ -17,7 +17,7 @@ import os, argparse
 def permute_isc_within(a, b, x, outfile, mask='', meth=None, hdf5=None, thresh=6000, n_pass=.7, n_reps=10000, t=False, kwargs=None):
     if not kwargs: kwargs = {}
     import numpy as np
-    from pycorr.funcs_correlate import crosscor, intersubcorr
+    from pycorr.funcs_correlate import crosscor, calc_isc_subttl
     from pycorr.subject import Run, Exp
     from pycorr.pietools import mkdir_p, parse_section, arr_slice
     # TASK ID so script knows where to slice, converts SGE_TASK_ID to 0-indexed
@@ -66,8 +66,8 @@ def permute_isc_within(a, b, x, outfile, mask='', meth=None, hdf5=None, thresh=6
 
     # Cross-Correlation matrix (we will permute rows and columns) -----------------
     out['isc_corrmat'] = crosscor(A+B, standardized=False)
-    out['isc_A'] = intersubcorr(out['isc_corrmat'][..., indx_A, :][..., :, indx_A])
-    out['isc_B'] = intersubcorr(out['isc_corrmat'][..., indx_B, :][..., :, indx_B])
+    out['isc_A'] = calc_isc_subttl(A, mean=False)
+    out['isc_B'] = calc_isc_subttl(B, mean=False)
 
     # Permutation Test ------------------------------------------------------------
     #ipdb.set_trace()
