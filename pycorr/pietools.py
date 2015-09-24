@@ -35,7 +35,7 @@ def copy_nii_hdr(nii, data, save="", neglog=False, nan=None):
     if type(data) is str: data = np.load(data)
 
     # Data transformations
-    if nan: data[np.isnan(data)] = nan
+    if nan is not None: data[np.isnan(data)] = nan
     if neglog: data = p_neglog10(data)
 
     hdr = nii.get_header()
@@ -95,6 +95,25 @@ def splice_dir(dirname, save=False, mmap=None):
     if save: np.save(dirname + '.npy', data)
     return data
 
+def splice_dir_with_ind(dirname, ind_dir, xyz_shape, mmap=None):
+    examp_fname = os.listdir(dirname)[0]
+    examp_data = np.load(os.path.join(dirname, examp_fname))
+    final_dim = [examp_data.shape[-1]] if examp_data.ndim > 1 else []
+    maxdims = xyz_shape + final_dim
+    print maxdims
+    out = np.zeros(maxdims,dtype='float32')
+    out[...] = np.nan
+    
+    for fname in os.listdir(ind_dir):
+        # Insert data into output matrix
+        ind = list(np.load(os.path.join(ind_dir, fname)))
+        data = np.load(os.path.join(dirname, fname), mmap_mode=mmap)
+        out[ind] = data
+
+    return out
+
+
+
 import errno
 
 def mkdir_p(path):
@@ -128,7 +147,9 @@ def arr_slice(nii_file, _slice):
         #del nii
         dat = load_nii_or_npy(nii_file)
     else: dat = nii_file
-    out = dat[_slice, np.newaxis].copy()
+    # Slicing
+    if type(_slice) is int: out = dat[_slice, np.newaxis].copy()
+    else: out = dat[_slice].copy()
     del dat                   #garbage collection
     gc.collect()
     return out

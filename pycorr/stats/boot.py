@@ -121,7 +121,11 @@ def calc_isc_subttl(dlist, mean=True):
     dsummed = sum_tc(dlist, nans = True, standardize_subs = False)
     isc = [corcomposite(sub, dsummed) for sub in dlist]
     if mean: return nanmean(isc, axis=0)
-    else:    return isc
+    else:
+        # Make a copy and transpose array. This is not very efficient,
+        # and should not be used for extremely time-sensitive computation.
+        tmp = np.array(isc)
+        return tmp.transpose(range(1,tmp.ndim) + [0])  # put first axis last
 
 def run_boot_within_isc_diff(A, B, l, n_samples, out_arr=None, indx_file=''):
     out = {}

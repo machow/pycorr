@@ -88,24 +88,29 @@ class Run:
         
             return final
 
-    def threshold(self, threshold, data=None, save=False):
+    def gen_threshold(self, thresh, data=None, save=False):
         """Boolean mask of values below threshold or that are nan.
 
         Parameters:
-        threshold -- value that mean timecourse must exceed
+        thresh    -- value that mean timecourse must exceed
         data      -- if given, threshold this data set. Otherwise, load run data.
         save      -- save threshold to dataset "threshold" in addition to returning
 
         """
         data = data if not data is None else self.load()
-        thresh_mask = ~(data.mean(axis=-1) > threshold)    #thresh anything not over threshold (including nan)
+        thresh_mask = self.threshold(thresh, data)    #thresh anything not over threshold (including nan)
         
         if save:
             self.thresh = self.grp.require_dataset('thresh', shape=self.data.shape[:-1], dtype=bool)
             assert self.thresh.shape == thresh_mask.shape           #TODO create thresh if not exist
             self.thresh[...] = thresh_mask
-            self.thresh.attrs['threshold'] = threshold
+            self.thresh.attrs['threshold'] = thresh
         self.grp.file.flush()
+        return thresh_mask
+
+    @staticmethod
+    def threshold(thresh, data):
+        thresh_mask = ~(data.mean(axis=-1) > thresh)    #thresh anything not over threshold (including nan)
         return thresh_mask
 
     def create_dataset(self, data, overwrite=False, reference=False, compression='gzip', chunks=(1,), **kwargs):

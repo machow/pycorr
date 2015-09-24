@@ -11,7 +11,7 @@ import nibabel as nib
 from itertools import combinations, product
 from scipy.stats.stats import nanmean
 
-def standardize(A, axis = -1, demean = True, devar = True, inplace=False):
+def standardize(A, axis = -1, demean = True, devar = True, inplace=False, rm_nan=False):
     """Subtract mean, divide standard deviation (z-scoring).
 
     Parameters:
@@ -28,8 +28,11 @@ def standardize(A, axis = -1, demean = True, devar = True, inplace=False):
         as they will propogate.
 
     """
-    m  = np.expand_dims(np.mean(A, axis),         axis)
-    sd = np.expand_dims( np.std(A, axis, ddof=1), axis)
+    # Select nan omitting funcs if rm_nan is True
+    mean, std = [np.nanmean, np.nanstd] if rm_nan else [np.mean, np.std]
+    # Calculate mean and standard deviation
+    m  = np.expand_dims(mean(A, axis),         axis)
+    sd = np.expand_dims( std(A, axis, ddof=1), axis)
     if inplace and 'f' in A.dtype.str:                   #make sure A is float
         #inplace operations
         if demean: A -= m

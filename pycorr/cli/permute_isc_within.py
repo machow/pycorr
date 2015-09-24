@@ -14,17 +14,24 @@ E.G. permute_isc_within.py -t -x 'all' -o test_out
 
 import os, argparse
 
-def permute_isc_within(a, b, x, outfile, mask='', meth=None, hdf5=None, thresh=6000, n_pass=.7, n_reps=10000, t=False, kwargs=None):
+def permute_isc_within(a, b, x, outfile, ind_file='', mask='', meth=None, hdf5=None, thresh=6000, n_pass=.7, n_reps=10000, t=False, kwargs=None):
     if not kwargs: kwargs = {}
     import numpy as np
-    from pycorr.funcs_correlate import crosscor, calc_isc_subttl
+    from pycorr.funcs_correlate import crosscor
     from pycorr.subject import Run, Exp
     from pycorr.pietools import mkdir_p, parse_section, arr_slice
-    # TASK ID so script knows where to slice, converts SGE_TASK_ID to 0-indexed
-    ID = parse_section(x) if x is not None else int(os.environ['SGE_TASK_ID']) - 1
+    from pycorr.stats.boot import calc_isc_subttl
 
     # OUTPUTS
     out = {}
+
+    # TASK ID so script knows where to slice, converts SGE_TASK_ID to 0-indexed
+    ID = parse_section(x) if x is not None else int(os.environ['SGE_TASK_ID']) - 1
+    # Optionally, get indices to use from file of good xyz voxels
+    if ind_file:
+        _slice = list(np.load(ind_file)[ID])
+        out['ind'] = _slice
+    else: _slice = ID
 
     # Load and Slice data ---------------------------------------------------------
     mask = np.load(mask) if mask else slice(None)
@@ -39,14 +46,10 @@ def permute_isc_within(a, b, x, outfile, mask='', meth=None, hdf5=None, thresh=6
             B_files = [os.path.join(b[0], fname) for fname in os.listdir(b[0])]
         else: raise BaseException('need either test or specify inputs')
 
-        A = [arr_slice(fname, ID)[...,mask].astype('float') for fname in A_files]
-        B = [arr_slice(fname, ID)[...,mask].astype('float') for fname in B_files]
-        # Thresholding
-        #Hack to get threshold function, which is a class method TODO def move threshold
-        import h5py
-        Run = Run(h5py.File('dummy.h5'))
+        A = [arr_slice(fname, _slice)[...,mask].astype('float') for fname in A_files]
+        B = [arr_slice(fname, _slice)[...,mask].astype('float') for fname in B_files]
 
-        # threshold tcs with low mean
+        # Thresholding tcs with low mean
         for dat in A+B: dat[Run.threshold(thresh, dat)] = np.nan      
         thresh_pass = [~np.isnan(dat.sum(axis=-1)) for dat in A+B]
         out['thresh_fail'] = Exp.cond_thresh(thresh_pass, mustpassprop=n_pass)
@@ -65,7 +68,7 @@ def permute_isc_within(a, b, x, outfile, mask='', meth=None, hdf5=None, thresh=6
     print indx_B
 
     # Cross-Correlation matrix (we will permute rows and columns) -----------------
-    out['isc_corrmat'] = crosscor(A+B, standardized=False)
+    #out['isc_corrmat'] = crosscor(A+B, standardized=False)
     out['isc_A'] = calc_isc_subttl(A, mean=False)
     out['isc_B'] = calc_isc_subttl(B, mean=False)
 
@@ -101,6 +104,7 @@ if __name__ == '__main__':
     parser.add_argument('-b', nargs='*', help='niftis in second group or condname if hdf5')
     parser.add_argument('-x', type=str, help='slice along row of input arrays to analyze. Can be "all" or slice notation (e.g. ::2)')  
     parser.add_argument('-o', '--outfile', type=str, help='output folder')
+    parser.add_argument('-i', '--ind_file', type=str, help='file of xyz indices to use for parallelization')
     parser.add_argument('-m', '--mask', type=str, help='boolean timecourse mask for subsetting')
     parser.add_argument('--meth', default='boot', help='type of test (perm or bootstrap)')
     parser.add_argument('--hdf5', nargs='?', help='hdf5 pipeline to load niftis from')
