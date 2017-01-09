@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import nanmean
+from numpy import nanmean
 from funcs_correlate import crosscor, corcomposite, corsubs
 
 def dset_overwrite(g, name, dat):

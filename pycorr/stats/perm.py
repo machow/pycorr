@@ -1,6 +1,6 @@
 import numpy as np
 from pycorr.funcs_correlate import corcomposite, sum_tc, intersubcorr
-from scipy.stats import nanmean
+from numpy import nanmean
 
 def isc_within_diff(A, B, standardized=False):
     """Contrast within-group subject-total correlation for A and B.

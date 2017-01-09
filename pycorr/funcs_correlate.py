@@ -9,7 +9,7 @@ Functions for loading, standardizing, and calculating correlations (including la
 import numpy as np
 import nibabel as nib
 from itertools import combinations, product
-from scipy.stats.stats import nanmean
+from numpy import nanmean
 
 def standardize(A, axis = -1, demean = True, devar = True, inplace=False, rm_nan=False):
     """Subtract mean, divide standard deviation (z-scoring).
